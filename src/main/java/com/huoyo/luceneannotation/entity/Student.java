@@ -16,5 +16,6 @@ public class Student {
     String studentId;
     @IndexColumn
     String studentName;
+    @IndexColumn
     String studentNum;
 }

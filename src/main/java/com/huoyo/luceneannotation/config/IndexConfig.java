@@ -13,11 +13,15 @@ import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.Executor;
 
 /**
  * @name：索引基础配置
@@ -26,6 +30,7 @@ import java.nio.file.Paths;
  * @date 2020/9/27 10:07
  */
 @Configuration
+@EnableAsync
 public class IndexConfig {
     String indexDir=System.getProperty("user.dir")+"/indexs";
 
@@ -72,6 +77,18 @@ public class IndexConfig {
         cRTReopenThead.setName("更新IndexReader线程");
         cRTReopenThead.start();
         return searcherManager;
+    }
+    @Bean("indexExecutor")
+    public Executor taskExecutro(){
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(10);
+        taskExecutor.setMaxPoolSize(100);
+        taskExecutor.setQueueCapacity(20000);
+        taskExecutor.setKeepAliveSeconds(60);
+        taskExecutor.setThreadNamePrefix("indexExecutor--");
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        taskExecutor.setAwaitTerminationSeconds(60);
+        return taskExecutor;
     }
 
 }
