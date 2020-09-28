@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface StudentService {
     boolean add(Student student);
+    boolean del(Student student);
     List<Student> searchTest(String student);
 }

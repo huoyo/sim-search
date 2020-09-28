@@ -1,6 +1,7 @@
 package com.huoyo.luceneannotation.task;
 
 import com.huoyo.luceneannotation.annotation.CreateIndex;
+import com.huoyo.luceneannotation.annotation.DeleteIndex;
 import com.huoyo.luceneannotation.annotation.IndexColumn;
 import com.huoyo.luceneannotation.annotation.IndexId;
 import lombok.extern.java.Log;
@@ -96,6 +97,48 @@ public class IndexTask {
                 } catch (IOException e) {
                     log.warning("提交异常："+e.getMessage());
                     e.printStackTrace();
+                }
+            }
+        }
+    }
+    @Async(value = "indexExecutor")
+    public void deleteIndex(ProceedingJoinPoint joinPoint) {
+        DeleteIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(DeleteIndex.class);
+        Object[] params = joinPoint.getArgs();
+        String[] paramNames = ((CodeSignature)joinPoint.getSignature()).getParameterNames();
+        String index = StringUtils.isEmpty(createIndex.indexParam())?paramNames[0]:createIndex.indexParam();
+        for (int i = 0; i <paramNames.length ; i++) {
+            if (index.equals(paramNames[i])) {
+                Object arg = params[i];
+                String indexIdColumn = "";
+                Object indexIdValue = "";
+                Field[] fields = arg.getClass().getDeclaredFields();
+                Document doc = new Document();
+                for (int j = 0; j < fields.length; j++) {
+                    IndexId indexId = fields[j].getAnnotation(IndexId.class);
+                    if (indexId!=null&& StringUtils.isEmpty(indexIdValue)) {
+                        indexIdColumn = fields[j].getName();
+                        PropertyDescriptor columnIdPd = null;
+                        try {
+                            columnIdPd = new PropertyDescriptor(indexIdColumn, arg.getClass());
+                            Method idMethod = columnIdPd.getReadMethod();
+                            indexIdValue = idMethod.invoke(arg);
+                            log.info("删除索引...");
+                            indexWriter.deleteDocuments(new Term(indexIdColumn,indexIdValue+""));
+                            indexWriter.addDocument(doc);
+                            indexWriter.commit();
+                            break;
+                        } catch (IntrospectionException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
             }
         }

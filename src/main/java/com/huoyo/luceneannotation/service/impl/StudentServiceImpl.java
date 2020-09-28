@@ -1,6 +1,7 @@
 package com.huoyo.luceneannotation.service.impl;
 
 import com.huoyo.luceneannotation.annotation.CreateIndex;
+import com.huoyo.luceneannotation.annotation.DeleteIndex;
 import com.huoyo.luceneannotation.annotation.SearchIndex;
 import com.huoyo.luceneannotation.entity.Student;
 import com.huoyo.luceneannotation.service.StudentService;
@@ -37,6 +38,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @CreateIndex(indexParam = "student")
     public boolean add(Student student) {
+        return false;
+    }
+    @Override
+    @DeleteIndex(indexParam = "student")
+    public boolean del(Student student) {
         return false;
     }
 

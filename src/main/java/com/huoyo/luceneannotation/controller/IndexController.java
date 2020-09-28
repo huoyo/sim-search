@@ -27,6 +27,11 @@ public class IndexController {
         studentService.add(student);
         return "成功";
     }
+    @RequestMapping("/del")
+    public String del(@RequestBody Student student) {
+        studentService.del(student);
+        return "成功";
+    }
 
     @RequestMapping("/search")
     public List<Student> function(String studentName) {

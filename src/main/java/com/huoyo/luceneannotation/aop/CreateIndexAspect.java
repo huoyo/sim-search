@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 @Log
-public class IndexAspect {
+public class CreateIndexAspect {
 
     @Autowired
     IndexTask indexTask;
