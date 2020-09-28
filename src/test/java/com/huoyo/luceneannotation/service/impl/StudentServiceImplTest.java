@@ -35,10 +35,12 @@ class StudentServiceImplTest {
             String[] linesSplit = line.split(",");
             String name = linesSplit[0];
             String mobile = linesSplit[1].replace("\n","");
+            String addre = linesSplit[2].replace("\n","");
             Student student = new Student();
             student.setStudentId(new Random().nextLong()+"");
             student.setStudentName(name);
             student.setStudentNum(mobile);
+            student.setAddress(addre);
             studentService.add(student);
 
         });

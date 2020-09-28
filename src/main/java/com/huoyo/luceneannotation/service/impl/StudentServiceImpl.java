@@ -50,4 +50,8 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> searchTest(String studentName) {
         return null;
     }
+    @SearchIndex(by = "address",searchEntity=Student.class)
+    public List<Student> searchaddress(String address) {
+        return null;
+    }
 }

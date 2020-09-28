@@ -18,4 +18,6 @@ public class Student {
     String studentName;
     @IndexColumn
     String studentNum;
+    @IndexColumn
+    String address;
 }

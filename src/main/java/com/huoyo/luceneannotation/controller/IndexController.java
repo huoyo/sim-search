@@ -38,4 +38,9 @@ public class IndexController {
         List<Student> docs = studentService.searchTest(studentName);
         return docs;
     }
+    @RequestMapping("/searchaddress")
+    public List<Student> function2(String address) {
+        List<Student> docs = studentService.searchaddress(address);
+        return docs;
+    }
 }

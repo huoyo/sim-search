@@ -137,7 +137,6 @@ public class IndexTask {
                         }catch (IOException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }
             }
