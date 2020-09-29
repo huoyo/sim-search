@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,11 +33,16 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableAsync
 public class IndexConfig {
-    String indexDir=System.getProperty("user.dir")+"/indexs";
+    String indexLocalDir=System.getProperty("user.dir")+"/indexs";
 
-
+    @Value("${sim-search.dir:}")
+    String indexDir;
     @Bean
     public Directory directory() throws IOException {
+        if (StringUtils.isEmpty(indexDir)) {
+            indexDir = indexLocalDir;
+        }
+        System.out.println("目录："+indexDir);
         Path path = Paths.get(indexDir);
         File file = path.toFile();
         if(!file.exists()) {
