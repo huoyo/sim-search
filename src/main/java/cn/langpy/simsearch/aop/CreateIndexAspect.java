@@ -1,7 +1,6 @@
 package cn.langpy.simsearch.aop;
 
 import cn.langpy.simsearch.task.IndexTask;
-import lombok.extern.java.Log;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
-@Log
 public class CreateIndexAspect {
 
     @Autowired

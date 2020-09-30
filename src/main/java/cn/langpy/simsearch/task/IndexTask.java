@@ -4,7 +4,6 @@ import cn.langpy.simsearch.annotation.CreateIndex;
 import cn.langpy.simsearch.annotation.DeleteIndex;
 import cn.langpy.simsearch.annotation.IndexColumn;
 import cn.langpy.simsearch.annotation.IndexId;
-import lombok.extern.java.Log;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -33,7 +32,6 @@ import java.lang.reflect.Method;
  * @date 2020/9/28 16:27
  */
 @Service
-@Log
 public class IndexTask {
     @Autowired
     IndexWriter indexWriter;
@@ -90,12 +88,10 @@ public class IndexTask {
                     }
                 }
                 try {
-                    log.info("更新索引...");
                     indexWriter.deleteDocuments(new Term(indexIdColumn,indexIdValue+""));
                     indexWriter.addDocument(doc);
                     indexWriter.commit();
                 } catch (IOException e) {
-                    log.warning("提交异常："+e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -123,7 +119,6 @@ public class IndexTask {
                             columnIdPd = new PropertyDescriptor(indexIdColumn, arg.getClass());
                             Method idMethod = columnIdPd.getReadMethod();
                             indexIdValue = idMethod.invoke(arg);
-                            log.info("删除索引...");
                             indexWriter.deleteDocuments(new Term(indexIdColumn,indexIdValue+""));
                             indexWriter.addDocument(doc);
                             indexWriter.commit();

@@ -50,7 +50,7 @@ public class SearchAspect {
         String[] paramNames = ((CodeSignature)joinPoint.getSignature()).getParameterNames();
         String indexName = StringUtils.isEmpty(searchIndex.by())?paramNames[0]:searchIndex.by();
         Class returnType = searchIndex.searchEntity();
-        List<Object> documents = new ArrayList<>();
+        List<Object> documents = new ArrayList<Object>();
         Object arg = params[0];
         IndexSearcher indexSearcher = null;
         try {
