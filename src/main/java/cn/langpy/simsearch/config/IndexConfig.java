@@ -37,12 +37,18 @@ public class IndexConfig {
 
     @Value("${sim-search.dir:}")
     String indexDir;
+    @Value("${sim-search.size.core:10}")
+    Integer coreSize;
+    @Value("${sim-search.size.max:200}")
+    Integer maxSize;
+    @Value("${sim-search.size.queue:20000}")
+    Integer queueSize;
+
     @Bean
     public Directory directory() throws IOException {
         if (StringUtils.isEmpty(indexDir)) {
             indexDir = indexLocalDir;
         }
-        System.out.println("目录："+indexDir);
         Path path = Paths.get(indexDir);
         File file = path.toFile();
         if(!file.exists()) {
@@ -76,7 +82,7 @@ public class IndexConfig {
     }
 
     @Bean
-    public SearcherManager searcherManager(Directory directory, IndexWriter indexWriter) throws IOException {
+    public SearcherManager searcherManager(IndexWriter indexWriter) throws IOException {
         SearcherManager searcherManager = new SearcherManager(indexWriter, false, new SearcherFactory());
         ControlledRealTimeReopenThread cRTReopenThead = new ControlledRealTimeReopenThread(new TrackingIndexWriter(indexWriter), searcherManager, 5.0, 0.025);
         cRTReopenThead.setDaemon(true);
@@ -87,9 +93,9 @@ public class IndexConfig {
     @Bean("indexExecutor")
     public Executor taskExecutro(){
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(10);
-        taskExecutor.setMaxPoolSize(100);
-        taskExecutor.setQueueCapacity(20000);
+        taskExecutor.setCorePoolSize(coreSize);
+        taskExecutor.setMaxPoolSize(maxSize);
+        taskExecutor.setQueueCapacity(queueSize);
         taskExecutor.setKeepAliveSeconds(60);
         taskExecutor.setThreadNamePrefix("indexExecutor--");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);

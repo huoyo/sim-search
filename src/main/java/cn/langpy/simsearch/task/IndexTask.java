@@ -15,6 +15,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +32,7 @@ import java.lang.reflect.Method;
  * @author：zhangchang
  * @date 2020/9/28 16:27
  */
-@Service
+@Component
 public class IndexTask {
     @Autowired
     IndexWriter indexWriter;
