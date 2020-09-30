@@ -2,10 +2,12 @@
 
 #### 介绍
 基于lucene的spring项目索引构建工具
-
+对于小型项目而言
+大部分项目都会涉及简单的搜索功能，本项目提供一个简单索引构建工具，轻便搜索，
+避免项目中大量使用like，或者ES之类的重量级软件
 
 #### 软件架构
-软件架构说明
+索引基于lucene的倒排索引创建
 
 
 #### 安装教程
@@ -19,6 +21,7 @@
   </dependency>
 ```
 2.  配置信息
+
 在application.yml中配置
 ```
 sim-search.dir=xxx  //索引位置，可不填，使用默认位置：当前项目下的indexs
@@ -54,11 +57,13 @@ public class StudentServiceImpl {
    public  boolean insert(Student student){
      /*业务逻辑*/
    }
-    /*加上@CreateIndex后 异步删除索引，不影响正常业务的保存逻辑 indexParam:需要删除索引的参数*/
+
+    /*加上@DeleteIndex后 异步删除索引，不影响正常业务的保存逻辑 indexParam:需要删除索引的参数*/
    @DeleteIndex(indexParam = "student")
    public  boolean delete(Student student){
      /*业务逻辑*/
    }
+
    /*根据name属性查询Student  */
    @SearchIndex(by = "name")
    public  List<Student> search(String name){
