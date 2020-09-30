@@ -23,12 +23,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @name：索引所搜实现过程
- * @function：
- * @author：zhangchang
- * @date 2020/9/27 10:14
- */
+
 @Aspect
 @Component
 public class SearchAspect {

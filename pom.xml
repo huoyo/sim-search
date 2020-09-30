@@ -6,7 +6,7 @@
     <artifactId>simsearch</artifactId>
     <version>1.0-snapshots</version>
     <name>simsearch</name>
-    <description></description>
+    <description>simple search</description>
     <properties>
         <java.version>1.8</java.version>
         <lunece.version>4.10.2</lunece.version>
@@ -18,6 +18,13 @@
             <url>http://www.apache.org/licenses/</url>
         </license>
     </licenses>
+    <url>https://gitee.com/huoyo/sim-search</url>
+    <scm>
+        <tag>master</tag>
+        <url>https://gitee.com/huoyo/sim-search.git</url>
+        <connection>scm:git:https://gitee.com/huoyo/sim-search.git</connection>
+        <developerConnection>scm:git:https://gitee.com/huoyo/sim-search.git</developerConnection>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -83,6 +90,18 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>
@@ -99,6 +118,30 @@
                     </execution>
                 </executions>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-gpg-plugin</artifactId>-->
+<!--                <version>1.6</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>sign-artifacts</id>-->
+<!--                        <phase>verify</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>sign</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+           <!-- <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>-->
         </plugins>
         <resources>
             <resource>

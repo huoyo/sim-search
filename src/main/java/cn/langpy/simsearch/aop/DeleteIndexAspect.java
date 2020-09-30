@@ -8,12 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * @name：创建索引注解实现过程
- * @function：
- * @author：zhangchang
- * @date 2020/9/27 10:14
- */
+
 @Aspect
 @Component
 public class DeleteIndexAspect {

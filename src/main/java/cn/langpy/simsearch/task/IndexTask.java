@@ -26,12 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * @name：
- * @function：
- * @author：zhangchang
- * @date 2020/9/28 16:27
- */
+
 @Component
 public class IndexTask {
     @Autowired

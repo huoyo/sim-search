@@ -24,12 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executor;
 
-/**
- * @name：索引基础配置
- * @function：
- * @author：zhangchang
- * @date 2020/9/27 10:07
- */
+
 @Configuration
 @EnableAsync
 public class IndexConfig {
