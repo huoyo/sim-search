@@ -1,4 +1,4 @@
-package cn.langpy.simsearch;
+package cn.langpy.simsearch.config;
 
 import org.springframework.context.annotation.ComponentScan;
 

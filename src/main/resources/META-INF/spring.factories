@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.langpy.simsearch.DefaultLucenConfig
+  cn.langpy.simsearch.config.DefaultLucenConfig
