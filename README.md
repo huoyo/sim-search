@@ -2,8 +2,9 @@
 
 #### 介绍
 基于lucene的spring项目索引构建工具
+
 对于小型项目而言
-大部分项目都会涉及简单的搜索功能，本项目提供一个简单索引构建工具，轻便搜索，
+大部分项目都会涉及简单的搜索功能，本项目提供一个简单索引构建工具，轻便高效搜索，
 避免项目中大量使用like，或者ES之类的重量级软件
 
 #### 软件架构
@@ -12,7 +13,7 @@
 
 #### 安装教程
 
-1.  引入依赖
+1.  引入依赖 或者 下载发行版本
 ```
  <dependency>
     <groupId>cn.langpy</groupId>
@@ -35,6 +36,7 @@ sim-search.size.queue=1000 //创建索引的线程队列容量，自行决定，
 ```java
 import cn.langpy.simsearch.annotation.IndexColumn;
 import cn.langpy.simsearch.annotation.IndexId;
+
 public class Student {
     /*索引唯一id*/
     @IndexId 
@@ -51,6 +53,7 @@ import cn.langpy.simsearch.annotation.CreateIndex;
 import cn.langpy.simsearch.annotation.DeleteIndex;
 import cn.langpy.simsearch.annotation.SearchIndex;
 import java.util.List;
+
 public class StudentServiceImpl {
     /*加上@CreateIndex后 异步创建索引，不影响正常业务的保存逻辑 indexParam:需要创建索引的参数*/
     @CreateIndex(indexParam = "student")
