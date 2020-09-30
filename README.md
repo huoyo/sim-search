@@ -3,6 +3,7 @@
 #### 介绍
 基于lucene的spring项目索引构建工具
 
+
 #### 软件架构
 软件架构说明
 
@@ -12,8 +13,8 @@
 1.  引入依赖
 ```
  <dependency>
-    <groupId>org.apache.lucene</groupId>
-    <artifactId>lucene-queryparser</artifactId>
+    <groupId>cn.langpy</groupId>
+    <artifactId>simsearch</artifactId>
     <version>${simsearch.version}</version>
   </dependency>
 ```
@@ -27,11 +28,45 @@ sim-search.size.queue=1000 //创建索引的线程队列容量，自行决定，
 ```
 
 #### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
+1.  在需要创建索引的实体上标注需要创建索引的字段
+```java
+import cn.langpy.simsearch.annotation.IndexColumn;
+import cn.langpy.simsearch.annotation.IndexId;
+public class Student {
+    /*索引唯一id*/
+    @IndexId 
+    private String id;
+    /*需要创建索引的字段*/
+    @IndexColumn
+    private String name;
+    private String age;
+}
+```
+2.  在需要创建索引的方法上加上创建索引的注解
+```java
+import cn.langpy.simsearch.annotation.CreateIndex;
+import cn.langpy.simsearch.annotation.DeleteIndex;
+import cn.langpy.simsearch.annotation.SearchIndex;
+import java.util.List;
+public class StudentServiceImpl {
+    /*加上@CreateIndex后 异步创建索引，不影响正常业务的保存逻辑 indexParam:需要创建索引的参数*/
+    @CreateIndex(indexParam = "student")
+   public  boolean insert(Student student){
+     /*业务逻辑*/
+   }
+    /*加上@CreateIndex后 异步删除索引，不影响正常业务的保存逻辑 indexParam:需要删除索引的参数*/
+   @DeleteIndex(indexParam = "student")
+   public  boolean delete(Student student){
+     /*业务逻辑*/
+   }
+   /*根据name属性查询Student  */
+   @SearchIndex(by = "name")
+   public  List<Student> search(String name){
+    /*方法内部什么都不需要写*/
+     return null;
+   }
+}
+```
 
 #### 说明
 
