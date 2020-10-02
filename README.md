@@ -111,8 +111,7 @@ public class StudentServiceImpl implements StudentService {
 
 #### 说明
 
-1.  本项目为个人构建，如有问题可联系本人：1729913829@qq.com
-2.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖，自行引入
+1.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖，自行引入
 ```
  <dependency>
         <groupId>org.aspectj</groupId>
