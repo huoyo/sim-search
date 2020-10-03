@@ -24,7 +24,7 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>1.0-snapshots</version>
+    <version>1.1</version>
   </dependency>
 ```
 2.  配置信息
@@ -110,7 +110,13 @@ public class StudentServiceImpl implements StudentService {
 ```
 注意：搜索结果仅仅是搜索出加上@IndexId和@IndexColumn的字段，具体内容自行往业务数据库查询
 
-#### 说明
+#### 版本说明
+
+> V1.0-snapshots：提供基础索引创建、删除和检索功能
+
+> V1.1：增加重启索引初始化功能
+
+#### 问题说明
 
 1.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖，自行引入
 ```
