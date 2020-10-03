@@ -24,7 +24,7 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>1.0-snapshots</version>
+    <version>1.1</version>
   </dependency>
 ```
 2.  配置信息
