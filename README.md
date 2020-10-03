@@ -31,10 +31,11 @@
 
 在application.yml中配置
 ```
-sim-search.dir=xxx  //索引位置，可不填，使用默认位置：当前项目下的indexs
+sim-search.dir=xxx  //索引位置，可不填，使用默认位置：当前项目下的indexs目录（第一次运行需手动创建）
 sim-search.size.core=10  //创建索引的核心线程数量，根据cpu自行决定，可不填，默认为10
 sim-search.size.max=10  //创建索引的最大线程数量，根据cpu自行决定，可不填，默认为200
 sim-search.size.queue=1000 //创建索引的线程队列容量，自行决定，可不填，默认为20000
+sim-search.index.init=true 重启时是否要对之前的索引进行删除，默认为false
 ```
 
 #### 使用说明
@@ -79,7 +80,7 @@ public class StudentServiceImpl implements StudentService {
 ```java
 @Service
 public class StudentServiceImpl implements StudentService {
-  /*加上@DeleteIndex后 异步删除索引，不影响正常业务的保存逻辑 indexParam:需要删除索引的参数*/
+  /*加上@DeleteIndex后 异步删除索引，不影响正常业务的删除逻辑 indexParam:需要删除索引的参数*/
    @DeleteIndex(indexParam = "student")
    public  boolean delete(Student student){
      /*业务逻辑*/
@@ -93,14 +94,14 @@ public class StudentServiceImpl implements StudentService {
 @Service
 public class StudentServiceImpl implements StudentService {
    /*根据studentName属性搜索Student 搜索的属性要和实体的属性保持一致  */
-   @SearchIndex(by = "studentName")
+   @SearchIndex(by = "studentName",searchEntity = Student.class)
    public  List<Student> search(String studentName){
     /*方法内部什么都不需要写*/
      return null;
    }
 
    /*根据schoolName属性搜索Student */
-   @SearchIndex(by = "schoolName")
+   @SearchIndex(by = "schoolName",searchEntity = Student.class)
    public  List<Student> search(String schoolName){
     /*方法内部什么都不需要写*/
      return null;

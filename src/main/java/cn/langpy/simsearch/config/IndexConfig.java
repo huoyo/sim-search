@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,6 +39,9 @@ public class IndexConfig {
     Integer maxSize;
     @Value("${sim-search.size.queue:20000}")
     Integer queueSize;
+    @Value("${sim-search.index.init:false}")
+    boolean indexInit;
+
 
     @Bean
     public Directory directory() throws IOException {
@@ -71,8 +75,10 @@ public class IndexConfig {
     public IndexWriter indexWriter(Directory directory) throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LATEST,new StandardAnalyzer());
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
-//        indexWriter.deleteAll();
-//        indexWriter.commit();
+        if (indexInit) {
+            indexWriter.deleteAll();
+            indexWriter.commit();
+        }
         return indexWriter;
     }
 
