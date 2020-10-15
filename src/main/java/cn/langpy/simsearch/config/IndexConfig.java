@@ -1,6 +1,4 @@
 package cn.langpy.simsearch.config;
-
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.ControlledRealTimeReopenThread;
@@ -11,14 +9,10 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,7 +35,6 @@ public class IndexConfig {
     Integer queueSize;
     @Value("${sim-search.index.init:false}")
     boolean indexInit;
-
 
     @Bean
     public Directory directory() throws IOException {
@@ -91,6 +84,7 @@ public class IndexConfig {
         cRTReopenThead.start();
         return searcherManager;
     }
+
     @Bean("indexExecutor")
     public Executor taskExecutro(){
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
