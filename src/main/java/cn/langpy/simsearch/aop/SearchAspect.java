@@ -9,6 +9,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 
 @Aspect
 @Component
@@ -23,7 +25,11 @@ public class SearchAspect {
 
     }
     @Around("preProcess()")
-    public Object  before(ProceedingJoinPoint joinPoint)  {
+    public Object  before(ProceedingJoinPoint joinPoint)  throws Throwable {
+        List<Object> searchResult = (List<Object>)indexTask.searchIndex(joinPoint);
+        if (searchResult==null||searchResult.size()==0) {
+            return joinPoint.proceed();
+        }
         return indexTask.searchIndex(joinPoint);
     }
 

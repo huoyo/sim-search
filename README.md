@@ -24,7 +24,7 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
   </dependency>
 ```
 2.  配置信息
@@ -97,6 +97,7 @@ public class StudentServiceImpl implements StudentService {
    @SearchIndex(by = "studentName",searchEntity = Student.class)
    public  List<Student> search(String studentName){
     /*方法内部什么都不需要写*/
+    
      return null;
    }
 
@@ -104,7 +105,8 @@ public class StudentServiceImpl implements StudentService {
    @SearchIndex(by = "schoolName",searchEntity = Student.class)
    public  List<Student> search(String schoolName){
     /*方法内部什么都不需要写*/
-     return null;
+    /*如果再索引中未查到对应信息，可通过该方法设置默认查询，比如往数据库进行like模糊匹配*/
+     return searchWithLikeByName(schoolName);
    }
 }
 ```
@@ -115,6 +117,8 @@ public class StudentServiceImpl implements StudentService {
 > V1.0-snapshots：提供基础索引创建、删除和检索功能
 
 > V1.1：增加重启索引初始化功能
+
+> V1.2：搜索时，如果未找到搜索，可走默认模式
 
 #### 问题说明
 
