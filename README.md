@@ -24,7 +24,7 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
   </dependency>
 ```
 2.  配置信息
@@ -119,6 +119,8 @@ public class StudentServiceImpl implements StudentService {
 > V1.1：增加重启索引初始化功能
 
 > V1.2：搜索时，如果未找到搜索，可走默认模式
+
+> V1.3：修复启动时索引目录未创建报错的bug
 
 #### 问题说明
 
