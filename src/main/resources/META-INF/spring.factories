@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cn.langpy.simsearch.config.DefaultLucenConfig
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.langpy.simsearch.config.DefaultLucenConfig
+org.springframework.context.ApplicationContextInitializer=cn.langpy.simsearch.config.IndexContextInit
