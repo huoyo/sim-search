@@ -8,12 +8,10 @@ import java.util.List;
 
 
 public interface IndexService {
-
     /**
      * create index by idName and idValue (it will delete existed index)
      */
     void createIndex(IndexContent indexContent);
-
     /**
      * delete index  by idName and idValue
      */

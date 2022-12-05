@@ -15,7 +15,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
 import static java.io.File.separator;
@@ -26,8 +25,7 @@ import static java.io.File.separator;
 public class IndexConfig {
     public static Logger log = Logger.getLogger(IndexConfig.class.toString());
 
-    String indexLocalDir = System.getProperty("user.dir") + separator + "indexs";
-
+    private static final String defaultIndexDirName = "indexs";
     @Value("${sim-search.dir:}")
     String indexDir;
     @Value("${sim-search.size.core:10}")
@@ -52,7 +50,7 @@ public class IndexConfig {
 
     public String checkDir() {
         if (indexDir == null || indexDir.length() == 0) {
-            indexDir = System.getProperty("user.dir") + separator + "indexs";
+            indexDir = System.getProperty("user.dir") + separator + defaultIndexDirName;
         }
         File file = new File(indexDir);
         if (!file.exists()) {
@@ -84,7 +82,7 @@ public class IndexConfig {
     }
 
     @Bean("indexExecutor")
-    public Executor taskExecutro() {
+    public ThreadPoolTaskExecutor taskExecutro() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(coreSize);
         taskExecutor.setMaxPoolSize(maxSize);

@@ -1,22 +1,24 @@
 package cn.langpy.simsearch.intercepter;
 
-import cn.langpy.simsearch.model.IndexContent;
 import cn.langpy.simsearch.model.IndexItem;
 import cn.langpy.simsearch.service.AopService;
 import cn.langpy.simsearch.service.IndexService;
-import cn.langpy.simsearch.task.IndexTask;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 
 @Aspect
 @Component
 public class DeleteIndexAspect {
-
+    @Resource(name = "indexExecutor")
+    ThreadPoolTaskExecutor executor;
     @Autowired
     AopService aopService;
     @Autowired
@@ -27,10 +29,12 @@ public class DeleteIndexAspect {
 
     }
     @Around("preProcess()")
-    public Object  before(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object  around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object re = joinPoint.proceed();
-        IndexItem indexContent = aopService.getDeleteItem(joinPoint);
-        indexService.deleteIndex(indexContent.getName(),indexContent.getValue());
+        executor.submit(()->{
+            IndexItem indexContent = aopService.getDeleteItem(joinPoint);
+            indexService.deleteIndex(indexContent.getName(),indexContent.getValue());
+        });
         return re;
     }
 
