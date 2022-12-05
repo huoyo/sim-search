@@ -1,5 +1,6 @@
 package cn.langpy.simsearch.config;
 
+import cn.langpy.simsearch.util.IndexManager;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.ControlledRealTimeReopenThread;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
@@ -45,7 +47,10 @@ public class IndexConfig {
     @Bean
     public Directory directory() throws IOException {
         indexDir = checkDir();
-        return FSDirectory.open(Paths.get(indexDir));
+        Path path = Paths.get(indexDir);
+        FSDirectory open = FSDirectory.open(path);
+        IndexManager.closeOnExit(open);
+        return open;
     }
 
     public String checkDir() {
@@ -60,7 +65,7 @@ public class IndexConfig {
         return indexDir;
     }
 
-    @Bean
+    @Bean("indexWriter")
     public IndexWriter indexWriter(Directory directory) throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new StandardAnalyzer());
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
@@ -68,16 +73,19 @@ public class IndexConfig {
             indexWriter.deleteAll();
             indexWriter.commit();
         }
+        IndexManager.closeOnExit(indexWriter);
         return indexWriter;
     }
 
-    @Bean
+    @Bean("searcherManager")
     public SearcherManager searcherManager(IndexWriter indexWriter) throws IOException {
         SearcherManager searcherManager = new SearcherManager(indexWriter, new SearcherFactory());
         ControlledRealTimeReopenThread cRTReopenThead = new ControlledRealTimeReopenThread(indexWriter, searcherManager, 5.0, 0.025);
         cRTReopenThead.setDaemon(true);
         cRTReopenThead.setName("Thread-update IndexReader");
         cRTReopenThead.start();
+        IndexManager.closeOnExit(searcherManager);
+        IndexManager.closeOnExit(cRTReopenThead);
         return searcherManager;
     }
 

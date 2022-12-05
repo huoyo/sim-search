@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReflectUtil {
-
+    public ReflectUtil() {
+        throw new RuntimeException("tool class can not be initialized!");
+    }
     public static Object getFieldValue(Field field) {
         field.setAccessible(true);
         try {

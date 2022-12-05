@@ -53,6 +53,16 @@ public class DefaultIndexService implements IndexService {
     }
 
     @Override
+    public void deleteAll() {
+        try {
+            indexWriter.deleteAll();
+            indexWriter.commit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public List<Document> searchIndex(String name, String value) {
         return searchIndex(name, value, 10);
     }

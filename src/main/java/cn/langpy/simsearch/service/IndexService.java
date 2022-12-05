@@ -16,6 +16,7 @@ public interface IndexService {
      * delete index  by idName and idValue
      */
     void deleteIndex(String idName, String idValue);
+    void deleteAll();
 
     List<Document> searchIndex(String name, String value, int topn);
 
