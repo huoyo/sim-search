@@ -1,4 +1,5 @@
 package cn.langpy.simsearch.config;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.ControlledRealTimeReopenThread;
@@ -6,15 +7,16 @@ import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 import static java.io.File.separator;
 
@@ -22,7 +24,9 @@ import static java.io.File.separator;
 @Configuration
 @EnableAsync
 public class IndexConfig {
-    String indexLocalDir=System.getProperty("user.dir")+separator+"indexs";
+    public static Logger log = Logger.getLogger(IndexConfig.class.toString());
+
+    String indexLocalDir = System.getProperty("user.dir") + separator + "indexs";
 
     @Value("${sim-search.dir:}")
     String indexDir;
@@ -35,18 +39,32 @@ public class IndexConfig {
     @Value("${sim-search.index.init:false}")
     boolean indexInit;
 
+    public void loadIndexsFromDb() {
+        // TODO: 2022-12-05 从数据载入索引
+    }
+
+
     @Bean
     public Directory directory() throws IOException {
-        if (StringUtils.isEmpty(indexDir)) {
-            indexDir = indexLocalDir;
+        indexDir = checkDir();
+        return FSDirectory.open(Paths.get(indexDir));
+    }
+
+    public String checkDir() {
+        if (indexDir == null || indexDir.length() == 0) {
+            indexDir = System.getProperty("user.dir") + separator + "indexs";
         }
         File file = new File(indexDir);
-        return FSDirectory.open(file);
+        if (!file.exists()) {
+            log.info("indexPath is null,it will be created automatically :" + indexDir);
+            file.mkdirs();
+        }
+        return indexDir;
     }
 
     @Bean
     public IndexWriter indexWriter(Directory directory) throws IOException {
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LATEST,new StandardAnalyzer());
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new StandardAnalyzer());
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
         if (indexInit) {
             indexWriter.deleteAll();
@@ -57,8 +75,8 @@ public class IndexConfig {
 
     @Bean
     public SearcherManager searcherManager(IndexWriter indexWriter) throws IOException {
-        SearcherManager searcherManager = new SearcherManager(indexWriter, false, new SearcherFactory());
-        ControlledRealTimeReopenThread cRTReopenThead = new ControlledRealTimeReopenThread(new TrackingIndexWriter(indexWriter), searcherManager, 5.0, 0.025);
+        SearcherManager searcherManager = new SearcherManager(indexWriter, new SearcherFactory());
+        ControlledRealTimeReopenThread cRTReopenThead = new ControlledRealTimeReopenThread(indexWriter, searcherManager, 5.0, 0.025);
         cRTReopenThead.setDaemon(true);
         cRTReopenThead.setName("Thread-update IndexReader");
         cRTReopenThead.start();
@@ -66,7 +84,7 @@ public class IndexConfig {
     }
 
     @Bean("indexExecutor")
-    public Executor taskExecutro(){
+    public Executor taskExecutro() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(coreSize);
         taskExecutor.setMaxPoolSize(maxSize);

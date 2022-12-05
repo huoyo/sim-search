@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SearchIndex {
+    String indexParam() default "";
+
     String by() default "";
     Class searchEntity() ;
 }

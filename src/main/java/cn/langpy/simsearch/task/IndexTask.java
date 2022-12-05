@@ -40,9 +40,9 @@ public class IndexTask {
     public void createIndex(ProceedingJoinPoint joinPoint) {
         CreateIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(CreateIndex.class);
         Object[] params = joinPoint.getArgs();
-        String[] paramNames = ((CodeSignature)joinPoint.getSignature()).getParameterNames();
-        String index = StringUtils.isEmpty(createIndex.indexParam())?paramNames[0]:createIndex.indexParam();
-        for (int i = 0; i <paramNames.length ; i++) {
+        String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
+        String index = StringUtils.isEmpty(createIndex.indexParam()) ? paramNames[0] : createIndex.indexParam();
+        for (int i = 0; i < paramNames.length; i++) {
             if (index.equals(paramNames[i])) {
                 Object arg = params[i];
                 String indexIdColumn = "";
@@ -51,14 +51,14 @@ public class IndexTask {
                 Document doc = new Document();
                 for (int j = 0; j < fields.length; j++) {
                     IndexId indexId = fields[j].getAnnotation(IndexId.class);
-                    if (indexId!=null&& StringUtils.isEmpty(indexIdValue)) {
+                    if (indexId != null && StringUtils.isEmpty(indexIdValue)) {
                         indexIdColumn = fields[j].getName();
                         PropertyDescriptor columnIdPd = null;
                         try {
                             columnIdPd = new PropertyDescriptor(indexIdColumn, arg.getClass());
                             Method idMethod = columnIdPd.getReadMethod();
                             indexIdValue = idMethod.invoke(arg);
-                            doc.add(new StringField(indexIdColumn, indexIdValue+"", org.apache.lucene.document.Field.Store.YES));
+                            doc.add(new StringField(indexIdColumn, indexIdValue + "", org.apache.lucene.document.Field.Store.YES));
                             continue;
                         } catch (IntrospectionException e) {
                             e.printStackTrace();
@@ -69,15 +69,15 @@ public class IndexTask {
                         }
 
                     }
-                    IndexColumn indexColumn = AnnotationUtils.findAnnotation(fields[j],IndexColumn.class);
-                    if (indexColumn!=null) {
+                    IndexColumn indexColumn = AnnotationUtils.findAnnotation(fields[j], IndexColumn.class);
+                    if (indexColumn != null) {
                         String indexNameColumn = fields[j].getName();
                         PropertyDescriptor columnPd = null;
                         try {
                             columnPd = new PropertyDescriptor(indexNameColumn, arg.getClass());
                             Method columnMethod = columnPd.getReadMethod();
                             Object indexNameValue = columnMethod.invoke(arg);
-                            doc.add(new TextField(indexNameColumn, indexNameValue+"", org.apache.lucene.document.Field.Store.YES));
+                            doc.add(new TextField(indexNameColumn, indexNameValue + "", org.apache.lucene.document.Field.Store.YES));
                         } catch (IntrospectionException e) {
                             e.printStackTrace();
                         } catch (IllegalAccessException e) {
@@ -88,7 +88,7 @@ public class IndexTask {
                     }
                 }
                 try {
-                    indexWriter.deleteDocuments(new Term(indexIdColumn,indexIdValue+""));
+                    indexWriter.deleteDocuments(new Term(indexIdColumn, indexIdValue + ""));
                     indexWriter.addDocument(doc);
                     indexWriter.commit();
                 } catch (IOException e) {
@@ -97,13 +97,14 @@ public class IndexTask {
             }
         }
     }
+
     @Async(value = "indexExecutor")
     public void deleteIndex(ProceedingJoinPoint joinPoint) {
         DeleteIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(DeleteIndex.class);
         Object[] params = joinPoint.getArgs();
-        String[] paramNames = ((CodeSignature)joinPoint.getSignature()).getParameterNames();
-        String index = StringUtils.isEmpty(createIndex.indexParam())?paramNames[0]:createIndex.indexParam();
-        for (int i = 0; i <paramNames.length ; i++) {
+        String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
+        String index = StringUtils.isEmpty(createIndex.indexParam()) ? paramNames[0] : createIndex.indexParam();
+        for (int i = 0; i < paramNames.length; i++) {
             if (index.equals(paramNames[i])) {
                 Object arg = params[i];
                 String indexIdColumn = "";
@@ -112,14 +113,14 @@ public class IndexTask {
                 Document doc = new Document();
                 for (int j = 0; j < fields.length; j++) {
                     IndexId indexId = fields[j].getAnnotation(IndexId.class);
-                    if (indexId!=null&& StringUtils.isEmpty(indexIdValue)) {
+                    if (indexId != null && StringUtils.isEmpty(indexIdValue)) {
                         indexIdColumn = fields[j].getName();
                         PropertyDescriptor columnIdPd = null;
                         try {
                             columnIdPd = new PropertyDescriptor(indexIdColumn, arg.getClass());
                             Method idMethod = columnIdPd.getReadMethod();
                             indexIdValue = idMethod.invoke(arg);
-                            indexWriter.deleteDocuments(new Term(indexIdColumn,indexIdValue+""));
+                            indexWriter.deleteDocuments(new Term(indexIdColumn, indexIdValue + ""));
                             indexWriter.addDocument(doc);
                             indexWriter.commit();
                             break;
@@ -129,7 +130,7 @@ public class IndexTask {
                             e.printStackTrace();
                         } catch (InvocationTargetException e) {
                             e.printStackTrace();
-                        }catch (IOException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -137,11 +138,12 @@ public class IndexTask {
             }
         }
     }
+
     public Object searchIndex(ProceedingJoinPoint joinPoint) {
         SearchIndex searchIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(SearchIndex.class);
         Object[] params = joinPoint.getArgs();
-        String[] paramNames = ((CodeSignature)joinPoint.getSignature()).getParameterNames();
-        String indexName = StringUtils.isEmpty(searchIndex.by())?paramNames[0]:searchIndex.by();
+        String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
+        String indexName = StringUtils.isEmpty(searchIndex.by()) ? paramNames[0] : searchIndex.by();
         Class returnType = searchIndex.searchEntity();
         List<Object> documents = new ArrayList<Object>();
         Object arg = params[0];
@@ -156,11 +158,11 @@ public class IndexTask {
         Query query = null;
         TopDocs topDocs = null;
         try {
-            query = parser.parse(arg+"");
+            query = parser.parse(arg + "");
             topDocs = indexSearcher.search(query, 10);
         } catch (ParseException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         ScoreDoc[] scoreDocs = topDocs.scoreDocs;
@@ -170,11 +172,11 @@ public class IndexTask {
             try {
                 doc = indexSearcher.doc(docID);
                 Object re = returnType.newInstance();
-                for(Field field:returnType.getDeclaredFields()){
+                for (Field field : returnType.getDeclaredFields()) {
                     String fieldName = field.getName();
                     PropertyDescriptor columnPd = new PropertyDescriptor(fieldName, returnType);
                     Method columnMethod = columnPd.getWriteMethod();
-                    columnMethod.invoke(re,doc.get(fieldName));
+                    columnMethod.invoke(re, doc.get(fieldName));
                 }
                 documents.add(re);
             } catch (Exception e) {

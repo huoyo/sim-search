@@ -1,5 +1,8 @@
-package cn.langpy.simsearch.aop;
+package cn.langpy.simsearch.intercepter;
 
+import cn.langpy.simsearch.model.IndexContent;
+import cn.langpy.simsearch.service.AopService;
+import cn.langpy.simsearch.service.IndexService;
 import cn.langpy.simsearch.task.IndexTask;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,19 +14,22 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class DeleteIndexAspect {
+public class CreateIndexAspect {
 
     @Autowired
-    IndexTask indexTask;
+    AopService aopService;
+    @Autowired
+    IndexService indexService;
 
-    @Pointcut("@annotation(cn.langpy.simsearch.annotation.DeleteIndex)")
+    @Pointcut("@annotation(cn.langpy.simsearch.annotation.CreateIndex)")
     public void preProcess(){
 
     }
     @Around("preProcess()")
     public Object  before(ProceedingJoinPoint joinPoint) throws Throwable {
         Object re = joinPoint.proceed();
-        indexTask.deleteIndex(joinPoint);
+        IndexContent indexContent = aopService.getIndexContent(joinPoint);
+        indexService.createIndex(indexContent);
         return re;
     }
 
