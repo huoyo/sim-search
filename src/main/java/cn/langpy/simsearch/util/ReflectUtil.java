@@ -11,8 +11,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class ReflectUtil {
+    public static Logger log = Logger.getLogger(ReflectUtil.class.toString());
+
     public ReflectUtil() {
         throw new RuntimeException("tool class can not be initialized!");
     }
@@ -45,7 +48,19 @@ public class ReflectUtil {
                     }
                     PropertyDescriptor columnPd = new PropertyDescriptor(fieldName, returnClass);
                     Method columnMethod = columnPd.getWriteMethod();
-                    columnMethod.invoke(re, v);
+                    if (field.getGenericType() == Integer.class) {
+                        columnMethod.invoke(re, Integer.valueOf(v));
+                    }else  if (field.getGenericType() == Double.class) {
+                        columnMethod.invoke(re, Double.valueOf(v));
+                    }else  if (field.getGenericType() == Float.class) {
+                        columnMethod.invoke(re, Float.valueOf(v));
+                    }else  if (field.getGenericType() == Long.class) {
+                        columnMethod.invoke(re, Long.valueOf(v));
+                    }else  if (field.getGenericType() == String.class) {
+                        columnMethod.invoke(re, v);
+                    }else {
+                        log.warning("can not set "+fieldName+"'s value,cause its type is "+field.getGenericType());
+                    }
                 }
                 returns.add(re);
             }

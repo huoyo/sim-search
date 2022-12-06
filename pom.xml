@@ -48,11 +48,6 @@
             <artifactId>lucene-analyzers-common</artifactId>
             <version>${lunece.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.lucene</groupId>-->
-<!--            <artifactId>lucene-highlighter</artifactId>-->
-<!--            <version>${lunece.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>

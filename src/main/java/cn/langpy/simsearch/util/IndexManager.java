@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * a full tool class for simsearch
+ */
 @Component
 public class IndexManager implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
@@ -76,9 +79,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static void closeOnExit(IndexReader indexReader) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            close(indexReader);
-        }));
+        ResourceHook.closeOnExit(indexReader);
     }
 
     public static void close(IndexWriter indexWriter) {
@@ -90,9 +91,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static void closeOnExit(IndexWriter indexWriter) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            close(indexWriter);
-        }));
+        ResourceHook.closeOnExit(indexWriter);
     }
 
     public static void close(Directory directory) {
@@ -104,9 +103,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static void closeOnExit(Directory directory) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            close(directory);
-        }));
+        ResourceHook.closeOnExit(directory);
     }
 
     public static void close(SearcherManager searcherManager) {
@@ -118,9 +115,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static void closeOnExit(SearcherManager searcherManager) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            close(searcherManager);
-        }));
+        ResourceHook.closeOnExit(searcherManager);
     }
 
     public static void close(ControlledRealTimeReopenThread controlledRealTimeReopenThread) {
@@ -132,8 +127,6 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static void closeOnExit(ControlledRealTimeReopenThread controlledRealTimeReopenThread) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            close(controlledRealTimeReopenThread);
-        }));
+        ResourceHook.closeOnExit(controlledRealTimeReopenThread);
     }
 }

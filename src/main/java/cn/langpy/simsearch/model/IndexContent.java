@@ -1,6 +1,5 @@
 package cn.langpy.simsearch.model;
 
-import org.apache.lucene.document.Field;
 
 import java.util.List;
 
@@ -8,6 +7,7 @@ public class IndexContent {
     private String idName;
     private String idValue;
     private List<IndexItem> items;
+
 
     public String getIdName() {
         return idName;

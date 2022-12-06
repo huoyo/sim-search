@@ -15,12 +15,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class DefaultAopService implements AopService {
+    private final static List<Class<?>> baseTypes = Arrays.asList(Integer.class, Double.class, Float.class, String.class, Boolean.class, List.class, Math.class);
 
-    public String getIndexParam(String indexParam,String[] paramNames,Method method) {
+    public String getIndexParam(String indexParam, String[] paramNames, Method method) {
         if (StringUtils.isEmpty(indexParam)) {
             if (paramNames.length == 0) {
                 throw new RuntimeException("can not create index for method " + method.getName() + ",cause it has not any parameter");
@@ -30,7 +32,7 @@ public class DefaultAopService implements AopService {
         return indexParam;
     }
 
-    public Object getIndexParamValue(String[] paramNames,Object[] paramValues,String indexParamName,Method method) {
+    public Object getIndexParamValue(String[] paramNames, Object[] paramValues, String indexParamName, Method method) {
         int indexParamIndex = -1;
         for (int i = 0; i < paramNames.length; i++) {
             if (indexParamName.equals(paramNames[i])) {
@@ -44,14 +46,23 @@ public class DefaultAopService implements AopService {
         Object indexParamValue = paramValues[indexParamIndex];
         return indexParamValue;
     }
+
+    public void checkParamValue(Object indexParamValue) {
+        Class<?> aClass = indexParamValue.getClass();
+        if (baseTypes.contains(aClass)) {
+            throw new RuntimeException("can not create index for base types:" + baseTypes);
+        }
+    }
+
     @Override
     public IndexContent getIndexContent(ProceedingJoinPoint joinPoint) {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         CreateIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(CreateIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
-        String indexParamName = getIndexParam(createIndex.indexParam(),paramNames,method);
+        String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
         Object[] paramValues = joinPoint.getArgs();
-        Object indexParamValue = getIndexParamValue(paramNames,paramValues,indexParamName,method);
+        Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
+        checkParamValue(indexParamValue);
         Field[] fields = indexParamValue.getClass().getDeclaredFields();
         IndexContent indexContent = new IndexContent();
         List<IndexItem> indexItems = new ArrayList<>();
@@ -85,11 +96,11 @@ public class DefaultAopService implements AopService {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         DeleteIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(DeleteIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
-        String indexParamName = getIndexParam(createIndex.indexParam(),paramNames,method);
+        String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
         Object[] paramValues = joinPoint.getArgs();
 
-        Object indexParamValue = getIndexParamValue(paramNames,paramValues,indexParamName,method);
-
+        Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
+        checkParamValue(indexParamValue);
         Field[] fields = indexParamValue.getClass().getDeclaredFields();
         IndexItem indexContent = new IndexItem();
         for (int j = 0; j < fields.length; j++) {
@@ -113,11 +124,11 @@ public class DefaultAopService implements AopService {
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         SearchIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(SearchIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
-        String indexParamName = getIndexParam(createIndex.indexParam(),paramNames,method);
+        String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
 
         Object[] paramValues = joinPoint.getArgs();
-        Object indexParamValue = getIndexParamValue(paramNames,paramValues,indexParamName,method);
-
+        Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
+        checkParamValue(indexParamValue);
         String searchColumnName = createIndex.by();
         if (StringUtils.isEmpty(searchColumnName)) {
             throw new RuntimeException("error by in @SearchIndex on method " + method.getName());
