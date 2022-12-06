@@ -3,6 +3,8 @@ package cn.langpy.simsearch.service.impl;
 import cn.langpy.simsearch.model.IndexContent;
 import cn.langpy.simsearch.model.IndexItem;
 import cn.langpy.simsearch.service.IndexService;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
@@ -95,11 +97,16 @@ public class DefaultIndexService implements IndexService {
 
 
     public Query buildFuzzyQuery(String entityName, String name, String value) {
-
-        QueryParser queryParser = new QueryParser(name, new StandardAnalyzer());
+        Analyzer analyzer = null;
+        if (value.matches("^[a-zA-Z]+$")) {
+            analyzer = new EnglishAnalyzer();
+        }else {
+            analyzer = new StandardAnalyzer();
+        }
+        QueryParser queryParser = new QueryParser(name,analyzer);
         Query query1 = null;
         try {
-            query1 = queryParser.parse(value);
+            query1 = queryParser.parse(value.trim());
         } catch (ParseException e) {
             e.printStackTrace();
         }
