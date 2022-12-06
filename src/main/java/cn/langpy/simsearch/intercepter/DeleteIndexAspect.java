@@ -33,7 +33,7 @@ public class DeleteIndexAspect {
         Object re = joinPoint.proceed();
         executor.submit(()->{
             IndexItem indexContent = aopService.getDeleteItem(joinPoint);
-            indexService.deleteIndex(indexContent.getName(),indexContent.getValue());
+            indexService.deleteIndex(indexContent.getEntitySource().getSimpleName(),indexContent.getName(),indexContent.getValue());
         });
         return re;
     }

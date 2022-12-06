@@ -19,32 +19,47 @@ import java.util.List;
 
 @Service
 public class DefaultIndexService implements IndexService {
+
+    private static String entityField = "entitySourceName";
     @Autowired
     IndexWriter indexWriter;
     @Autowired
     SearcherManager searcherManager;
 
     @Override
-    public void createIndex(IndexContent indexContent) {
+    public synchronized void createIndex(IndexContent indexContent) {
         try {
             Document doc = new Document();
             doc.add(new StringField(indexContent.getIdName(), indexContent.getIdValue(), Field.Store.YES));
+            doc.add(new StringField(entityField, indexContent.getEntitySource().getSimpleName(), Field.Store.YES));
             for (IndexItem item : indexContent.getItems()) {
                 doc.add(new TextField(item.getName(), item.getValue(), Field.Store.YES));
             }
+            deleteIndex(indexContent.getEntitySource().getSimpleName(), indexContent.getIdName(), indexContent.getIdValue());
             indexWriter.addDocument(doc);
+            indexWriter.flush();
             indexWriter.commit();
         } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
-    public void deleteIndex(String idName, String idValue) {
+    public void deleteIndex(String entityName, String idName, String idValue) {
         try {
-            indexWriter.deleteDocuments(new Term(idName, idValue));
+            indexWriter.deleteDocuments(buildStrictQuery(entityName, idName, idValue));
             indexWriter.commit();
         } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -55,17 +70,48 @@ public class DefaultIndexService implements IndexService {
             indexWriter.deleteAll();
             indexWriter.commit();
         } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
-    public List<Document> searchIndex(String name, String value) {
-        return searchIndex(name, value, 10);
+    public List<Document> searchIndexs(String entityName, String name, String value) {
+        return searchIndexs(entityName, name, value, 10);
+    }
+
+    public BooleanQuery buildStrictQuery(String entityName, String name, String value) {
+        Query query1 = new TermQuery(new Term(name, value));
+        Query query2 = new TermQuery(new Term(entityField, entityName));
+        BooleanQuery.Builder boolQuery = new BooleanQuery.Builder();
+        boolQuery.add(query1, BooleanClause.Occur.MUST);
+        boolQuery.add(query2, BooleanClause.Occur.MUST);
+        return boolQuery.build();
+    }
+
+
+    public Query buildFuzzyQuery(String entityName, String name, String value) {
+
+        QueryParser queryParser = new QueryParser(name, new StandardAnalyzer());
+        Query query1 = null;
+        try {
+            query1 = queryParser.parse(value);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Query query2 = new TermQuery(new Term(entityField, entityName));
+        BooleanQuery.Builder boolQuery = new BooleanQuery.Builder();
+        boolQuery.add(query1, BooleanClause.Occur.MUST);
+        boolQuery.add(query2, BooleanClause.Occur.MUST);
+        return boolQuery.build();
     }
 
     @Override
-    public List<Document> searchIndex(String name, String value, int topn) {
+    public List<Document> searchIndexs(String name, String value) {
         List<Document> documents = new ArrayList<>();
         IndexSearcher indexSearcher = null;
         try {
@@ -74,14 +120,43 @@ public class DefaultIndexService implements IndexService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        QueryParser parser = new QueryParser(name, new StandardAnalyzer());
-        Query query;
+
+        TopDocs topDocs = null;
+        QueryParser qp = new QueryParser(name, new StandardAnalyzer());
+        try {
+            Query q = qp.parse(value);
+            topDocs = indexSearcher.search(q, 100);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+        for (ScoreDoc scoreDoc : scoreDocs) {
+            int docID = scoreDoc.doc;
+            Document doc;
+            try {
+                doc = indexSearcher.doc(docID);
+                documents.add(doc);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return documents;
+    }
+
+    @Override
+    public List<Document> searchIndexs(String entityName, String name, String value, int topn) {
+        List<Document> documents = new ArrayList<>();
+        IndexSearcher indexSearcher = null;
+        try {
+            searcherManager.maybeRefresh();
+            indexSearcher = searcherManager.acquire();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         TopDocs topDocs = null;
         try {
-            query = parser.parse(value);
-            topDocs = indexSearcher.search(query, topn);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            topDocs = indexSearcher.search(buildFuzzyQuery(entityName, name, value), topn);
         } catch (IOException e) {
             e.printStackTrace();
         }

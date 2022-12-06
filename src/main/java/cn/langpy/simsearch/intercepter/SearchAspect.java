@@ -33,12 +33,11 @@ public class SearchAspect {
     @Around("preProcess()")
     public Object  around(ProceedingJoinPoint joinPoint)  throws Throwable {
         IndexItem indexContent = aopService.getSearchItem(joinPoint);
-        List<Document> documents = indexService.searchIndex(indexContent.getName(), indexContent.getValue());
+        List<Document> documents = indexService.searchIndexs(indexContent.getEntitySource().getSimpleName(),indexContent.getName(), indexContent.getValue());
         if (documents.size()==0) {
             return joinPoint.proceed();
         }
-        Class<?> returnClass = aopService.getReturnClass(joinPoint);
-        List<?> objects = ReflectUtil.transToReturnObject(documents, returnClass);
+        List<?> objects = ReflectUtil.transToReturnObject(documents, indexContent.getEntitySource());
         return objects;
     }
 

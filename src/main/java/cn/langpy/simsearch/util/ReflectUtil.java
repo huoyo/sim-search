@@ -1,6 +1,7 @@
 package cn.langpy.simsearch.util;
 
 
+import cn.langpy.simsearch.annotation.IndexId;
 import org.apache.lucene.document.Document;
 
 import java.beans.IntrospectionException;
@@ -19,10 +20,11 @@ public class ReflectUtil {
     public ReflectUtil() {
         throw new RuntimeException("tool class can not be initialized!");
     }
-    public static Object getFieldValue(Field field) {
+
+    public static Object getFieldValue(Field field,Object o) {
         field.setAccessible(true);
         try {
-            Object indexColumnValue = field.get(field.getName());
+            Object indexColumnValue = field.get(o);
             return indexColumnValue;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -50,16 +52,16 @@ public class ReflectUtil {
                     Method columnMethod = columnPd.getWriteMethod();
                     if (field.getGenericType() == Integer.class) {
                         columnMethod.invoke(re, Integer.valueOf(v));
-                    }else  if (field.getGenericType() == Double.class) {
+                    } else if (field.getGenericType() == Double.class) {
                         columnMethod.invoke(re, Double.valueOf(v));
-                    }else  if (field.getGenericType() == Float.class) {
+                    } else if (field.getGenericType() == Float.class) {
                         columnMethod.invoke(re, Float.valueOf(v));
-                    }else  if (field.getGenericType() == Long.class) {
+                    } else if (field.getGenericType() == Long.class) {
                         columnMethod.invoke(re, Long.valueOf(v));
-                    }else  if (field.getGenericType() == String.class) {
+                    } else if (field.getGenericType() == String.class) {
                         columnMethod.invoke(re, v);
-                    }else {
-                        log.warning("can not set "+fieldName+"'s value,cause its type is "+field.getGenericType());
+                    } else {
+                        log.warning("can not set " + fieldName + "'s value,cause its type is " + field.getGenericType());
                     }
                 }
                 returns.add(re);
@@ -75,4 +77,41 @@ public class ReflectUtil {
         }
         return returns;
     }
+
+    public static <T> List<T> transToReturnId(List<Document> documents, Class<?> returnClass) {
+        List<T> returns = new ArrayList<>();
+        for (Document document : documents) {
+            for (Field field : returnClass.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
+                    continue;
+                }
+                IndexId indexId = field.getAnnotation(IndexId.class);
+                if (indexId != null) {
+                    String fieldName = field.getName();
+                    String v = document.get(fieldName);
+                    if (v == null) {
+                        continue;
+                    }
+                    if (field.getGenericType() == Integer.class) {
+                        returns.add((T) Integer.valueOf(v));
+                    } else if (field.getGenericType() == Double.class) {
+                        returns.add((T) Double.valueOf(v));
+                    } else if (field.getGenericType() == Float.class) {
+                        returns.add((T) Float.valueOf(v));
+                    } else if (field.getGenericType() == Long.class) {
+                        returns.add((T) Long.valueOf(v));
+                    } else if (field.getGenericType() == String.class) {
+                        returns.add((T) v);
+                    } else {
+                        log.warning("can not set " + fieldName + "'s value,cause its type is " + field.getGenericType());
+                    }
+                    break;
+                }
+            }
+        }
+
+        return returns;
+    }
+
+
 }

@@ -45,7 +45,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     /**
-     * create index by idName and idValue (it will delete existed index)
+     * create index by idName and idValue (it will delete existed index,so you can think of this method as insertOrUpdate())
      */
     public static void createIndex(IndexContent indexContent) {
         indexService.createIndex(indexContent);
@@ -54,17 +54,32 @@ public class IndexManager implements ApplicationContextAware {
     /**
      * delete index  by idName and idValue
      */
-    public static void deleteIndex(String idName, String idValue) {
-        indexService.deleteIndex(idName, idValue);
+    public static void deleteIndex(String idName, String idValue,Class entityClass) {
+        indexService.deleteIndex(entityClass.getSimpleName(),idName, idValue);
     }
 
-    public static List<Document> searchIndex(String name, String value, int topn) {
-        return indexService.searchIndex(name, value, topn);
+    public static List<Document> searchIndexs(String name, String value, int topn,Class entityClass) {
+        return indexService.searchIndexs(entityClass.getSimpleName(),name, value, topn);
+    }
+    public static List<Document> searchIndexs(String name, String value) {
+        return indexService.searchIndexs(name, value);
     }
 
-    public static List<Document> searchIndex(String name, String value) {
-        return searchIndex(name, value);
+    public static List<Document> searchIndexs(String name, String value,Class entityClass) {
+        return searchIndexs(name, value,10,entityClass);
     }
+
+    public static <T> List<T> searchIndexIds(String name, String value,Class<?> entityClass) {
+        List<Document> docs = searchIndexs(name, value,entityClass);
+        List<T> objects = ReflectUtil.transToReturnId(docs, entityClass);
+        return objects;
+    }
+    public static <T> List<T> searchIndexObjects(String name, String value,Class entityClass) {
+        List<Document> docs = searchIndexs(name, value,entityClass);
+        List<T> objects = ReflectUtil.transToReturnObject(docs, entityClass);
+        return objects;
+    }
+
 
     public static void deleteAll() {
         indexService.deleteAll();

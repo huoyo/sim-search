@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface IndexService {
     /**
-     * create index by idName and idValue (it will delete existed index)
+     * create index by idName and idValue (it will delete existed index,so you can think of this method as insertOrUpdate())
      */
     void createIndex(IndexContent indexContent);
     /**
      * delete index  by idName and idValue
      */
-    void deleteIndex(String idName, String idValue);
+    void deleteIndex(String entityName,String idName, String idValue);
 
     /**
      * delete all indexs
@@ -25,8 +25,8 @@ public interface IndexService {
     /**
      * search Documents by field name and its value
      */
-    List<Document> searchIndex(String name, String value, int topn);
-
-    List<Document> searchIndex(String name, String value);
+    List<Document> searchIndexs(String entityName,String name, String value, int topn);
+    List<Document> searchIndexs(String name, String value);
+    List<Document> searchIndexs(String entityName,String name, String value);
 
 }

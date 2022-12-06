@@ -73,20 +73,21 @@ public class DefaultAopService implements AopService {
             }
             IndexId indexId = field.getAnnotation(IndexId.class);
             if (indexId != null) {
-                Object indexIdColumnValue = ReflectUtil.getFieldValue(field);
+                Object indexIdColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
                 indexContent.setIdName(field.getName());
                 indexContent.setIdValue(indexIdColumnValue + "");
                 continue;
             }
             IndexColumn indexColumn = field.getAnnotation(IndexColumn.class);
             if (indexColumn != null) {
-                Object indexColumnValue = ReflectUtil.getFieldValue(field);
+                Object indexColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
                 IndexItem indexItem = new IndexItem();
                 indexItem.setName(field.getName());
                 indexItem.setValue(indexColumnValue + "");
                 indexItems.add(indexItem);
             }
         }
+        indexContent.setEntitySource(indexParamValue.getClass());
         indexContent.setItems(indexItems);
         return indexContent;
     }
@@ -110,12 +111,13 @@ public class DefaultAopService implements AopService {
             }
             IndexId indexId = field.getAnnotation(IndexId.class);
             if (indexId != null) {
-                Object indexIdColumnValue = ReflectUtil.getFieldValue(field);
+                Object indexIdColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
                 indexContent.setName(field.getName());
                 indexContent.setValue(indexIdColumnValue + "");
                 break;
             }
         }
+        indexContent.setEntitySource(indexParamValue.getClass());
         return indexContent;
     }
 
@@ -142,11 +144,12 @@ public class DefaultAopService implements AopService {
                 continue;
             }
             if (searchColumnName.equals(field.getName())) {
-                Object indexIdColumnValue = ReflectUtil.getFieldValue(field);
+                Object indexIdColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
                 indexContent.setName(field.getName());
                 indexContent.setValue(indexIdColumnValue + "");
             }
         }
+        indexContent.setEntitySource(indexParamValue.getClass());
         return indexContent;
     }
 
