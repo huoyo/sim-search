@@ -97,18 +97,17 @@ public class DefaultIndexService implements IndexService {
 
 
     public Query buildFuzzyQuery(String entityName, String name, String value) {
-        Analyzer analyzer = null;
-        if (value.matches("^[a-zA-Z]+$")) {
-            analyzer = new EnglishAnalyzer();
-        }else {
-            analyzer = new StandardAnalyzer();
-        }
-        QueryParser queryParser = new QueryParser(name,analyzer);
         Query query1 = null;
-        try {
-            query1 = queryParser.parse(value.trim());
-        } catch (ParseException e) {
-            e.printStackTrace();
+
+        if (value.matches("^[a-zA-Z0-9]+$")) {
+             query1=new FuzzyQuery(new Term(name,value.trim()),4);
+        }else {
+            QueryParser queryParser = new QueryParser(name,new StandardAnalyzer());
+            try {
+                query1 = queryParser.parse(value.trim());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         Query query2 = new TermQuery(new Term(entityField, entityName));
         BooleanQuery.Builder boolQuery = new BooleanQuery.Builder();
