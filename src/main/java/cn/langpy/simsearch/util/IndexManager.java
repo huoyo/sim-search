@@ -66,7 +66,7 @@ public class IndexManager implements ApplicationContextAware {
     }
 
     public static List<Document> searchIndexs(String name, String value,Class entityClass) {
-        return searchIndexs(name, value,10,entityClass);
+        return searchIndexs(name, value,50,entityClass);
     }
 
     public static <T> List<T> searchIndexIds(String name, String value,Class<?> entityClass) {

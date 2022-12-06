@@ -6,10 +6,8 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.search.ControlledRealTimeReopenThread;
 import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.TrackingDirectoryWrapper;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.lucene.store.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -26,41 +24,41 @@ import static java.io.File.separator;
 @Configuration
 @EnableAsync
 public class IndexConfig {
+    @Autowired
+    private SimSearchConfig searchConfig;
     public static Logger log = Logger.getLogger(IndexConfig.class.toString());
 
     private static final String defaultIndexDirName = "indexs";
-    @Value("${sim-search.dir:}")
-    String indexDir;
-    @Value("${sim-search.size.core:10}")
-    Integer coreSize;
-    @Value("${sim-search.size.max:200}")
-    Integer maxSize;
-    @Value("${sim-search.size.queue:20000}")
-    Integer queueSize;
-    @Value("${sim-search.index.init:false}")
-    boolean indexInit;
-
-    public void loadIndexsFromDb() {
-        // TODO: 2022-12-05 从数据载入索引
-    }
-
-
     @Bean
     public Directory directory() throws IOException {
-        indexDir = checkDir();
-        Path path = Paths.get(indexDir);
-        FSDirectory open = FSDirectory.open(path);
-        IndexManager.closeOnExit(open);
-        return open;
+
+        Directory directory = null;
+        if ("memory".equals(searchConfig.getSaver())) {
+            directory = new ByteBuffersDirectory();
+        } else if ("memory-fs".equals(searchConfig.getSaver())) {
+            Path path = Paths.get(checkDir());
+            directory = MMapDirectory.open(path);
+        } else if ("base-fs".equals(searchConfig.getSaver())){
+            Path path = Paths.get(checkDir());
+            directory = FSDirectory.open(path);
+        } else if ("nio-fs".equals(searchConfig.getSaver())){
+            Path path = Paths.get(checkDir());
+            directory = NIOFSDirectory.open(path);
+        }else {
+            throw new RuntimeException("error `sim-search.saver`,please choice in [memory,memory-fs,base-fs,nio-fs]");
+        }
+        IndexManager.closeOnExit(directory);
+        return directory;
     }
 
     public String checkDir() {
-        if (indexDir == null || indexDir.length() == 0) {
+        String indexDir = null;
+        if (searchConfig.getDir() == null || searchConfig.getDir().length() == 0) {
             indexDir = System.getProperty("user.dir") + separator + defaultIndexDirName;
         }
-        File file = new File(indexDir);
+        File file = new File(searchConfig.getDir());
         if (!file.exists()) {
-            log.info("indexPath is null,it will be created automatically :" + indexDir);
+            log.info("indexPath is null,it will be created automatically :" + searchConfig.getDir());
             file.mkdirs();
         }
         return indexDir;
@@ -70,7 +68,7 @@ public class IndexConfig {
     public IndexWriter indexWriter(Directory directory) throws IOException {
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(new StandardAnalyzer());
         IndexWriter indexWriter = new IndexWriter(directory, indexWriterConfig);
-        if (indexInit) {
+        if (searchConfig.getIndexInit()) {
             indexWriter.deleteAll();
             indexWriter.commit();
         }
@@ -93,9 +91,9 @@ public class IndexConfig {
     @Bean("indexExecutor")
     public ThreadPoolTaskExecutor taskExecutro() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(coreSize);
-        taskExecutor.setMaxPoolSize(maxSize);
-        taskExecutor.setQueueCapacity(queueSize);
+        taskExecutor.setCorePoolSize(searchConfig.getThreadCoreSize());
+        taskExecutor.setMaxPoolSize(searchConfig.getThreadMaxSize());
+        taskExecutor.setQueueCapacity(searchConfig.getThreadQueueSize());
         taskExecutor.setKeepAliveSeconds(60);
         taskExecutor.setThreadNamePrefix("indexExecutor--");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);

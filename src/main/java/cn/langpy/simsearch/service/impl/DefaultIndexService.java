@@ -81,7 +81,7 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String entityName, String name, String value) {
-        return searchIndexs(entityName, name, value, 10);
+        return searchIndexs(entityName, name, value, 50);
     }
 
     public BooleanQuery buildStrictQuery(String entityName, String name, String value) {

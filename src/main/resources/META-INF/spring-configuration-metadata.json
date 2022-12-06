@@ -1,0 +1,54 @@
+{
+  "groups": [
+    {
+      "name": "sim-search",
+      "type": "java.lang.String",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "sim-search.dir",
+      "type": "java.lang.String",
+      "defaultValue": "indexs",
+      "description": "the directory of storing index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.saver",
+      "type": "java.lang.String",
+      "defaultValue": "memory",
+      "description": "the store type  of storing index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.thread-core-size",
+      "type": "java.lang.Integer",
+      "defaultValue": 5,
+      "description": "the core number of threads to store index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.thread-max-size",
+      "type": "java.lang.Integer",
+      "defaultValue": 200,
+      "description": "the max number of threads to store index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.thread-queue-size",
+      "type": "java.lang.Integer",
+      "defaultValue": 20000,
+      "description": "the size of queue to store index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.index-init",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "the switch to reset data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    }
+  ],
+  "hints": []
+}
