@@ -59,7 +59,7 @@ public class Test1Controller {
         List<Test1> searchList = test1Service.fuzzyQuery(test1);
         /*搜索结果的内容仅仅包含标有@IndexId和@IndexColumn注解的字段*/
         /*所以需要使用索引出来的id去数据库查询对应的内容*/
-        if (searchList.size()>0) {
+        if (searchList.size()==0) {
             return Result.failed("失败");
         }
         return Result.success(searchList.get(0));
