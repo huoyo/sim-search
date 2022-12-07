@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -98,13 +99,12 @@ public class DefaultIndexService implements IndexService {
 
     public Query buildFuzzyQuery(String entityName, String name, String value) {
         Query query1 = null;
-
         if (value.matches("^[a-zA-Z0-9]+$")) {
-             query1=new FuzzyQuery(new Term(name,value.trim()),4);
+             query1=new FuzzyQuery(new Term(name,value),2);
         }else {
             QueryParser queryParser = new QueryParser(name,new StandardAnalyzer());
             try {
-                query1 = queryParser.parse(value.trim());
+                query1 = queryParser.parse(value);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -118,6 +118,10 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String name, String value) {
+        if (value==null || name==null) {
+            return Collections.emptyList();
+        }
+        value = value.trim();
         List<Document> documents = new ArrayList<>();
         IndexSearcher indexSearcher = null;
         try {
@@ -151,6 +155,10 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String entityName, String name, String value, int topn) {
+        if (value==null || name==null) {
+            return Collections.emptyList();
+        }
+        value = value.trim();
         List<Document> documents = new ArrayList<>();
         IndexSearcher indexSearcher = null;
         try {
