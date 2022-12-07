@@ -42,7 +42,7 @@
 
 2.  配置信息
 
-在application.yml中配置
+在application.properties中配置
 ```
 #索引存储器 默认为内存 [memory,memory-fs,base-fs,nio-fs]
 #内存富裕的情况下使用memory，如果是百万以上数据量选用fs系列
