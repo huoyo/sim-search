@@ -19,7 +19,7 @@ public class SimSearchConfig {
     private Integer sizeMax = 200;
     private Integer threadMaxSize = 200;
     @Deprecated
-    private Integer sizeQueue = 20000;
+    private Integer sizeQueue = 200000;
     private Integer threadQueueSize = 200000;
     private Integer resultSize = 50;
     @Deprecated

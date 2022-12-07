@@ -1,21 +1,33 @@
-# sim-search
+
+> 本项目由于之前的架构有些问题，关闭了一段时间，经过重构进行开放
+
+
+<div align="center">
+    <h1 >SimSearch</h1> 
+</div>
+
+<div align="center">
+    <img src='https://shields.io/badge/version-2.0.0.BETA-green.svg'>
+    <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
+    <img src='https://shields.io/badge/dependencies-Spring|aspectjweaver|lucene-r.svg'>
+</div>
 
 #### 介绍
-基于lucene的spring项目索引构建工具，不只是简单快捷搜索：
 
-大部分项目都会涉及简单的搜索功能，本项目提供一个简单索引构建工具，使用注解，轻便高效搜索，
+一个轻量级的springboot项目索引构建工具，不只是简单快捷搜索：
+
+大部分项目都会涉及模糊搜索功能，本项目提供一个简单索引构建工具，使用注解，轻便高效搜索，
 避免项目中大量使用like或者其他效率低的搜索机制，相比于ES,这是一种轻量级的实现方式
 
-优点：
-> * 无缝集成spring，使用简单
-> * 注解实现索引创建和搜索，与业务逻辑无耦合
-> * 可用于大数据量搜索，毫秒级响应
-> * 基于倒排索引，避免全量匹配和手动分词
+特点：
 
-缺点：
-> * 目前仅适用于单机版，不支持分布式和集群
-> * 索引存储单一，暂时不适配多种存储介质
-> * 暂不支持大于小于之类的比较搜索
+- [x] 无缝集成springboot，使用简单
+- [x] 注解实现索引创建和搜索，与业务逻辑无耦合
+- [x] 可用于大数据量模糊搜索，毫秒级响应
+- [x] 基于倒排索引，避免全量匹配和手动分词
+- [x] 底层基于lucene
+
+
 
 #### 安装教程
 
@@ -24,32 +36,44 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>1.3</version>
+    <version>2.0.0.BETA</version>
   </dependency>
 ```
+
 2.  配置信息
 
 在application.yml中配置
 ```
-sim-search.dir=xxx  //索引位置，可不填，使用默认位置：当前项目下的indexs目录（第一次运行需手动创建）
-sim-search.size.core=10  //创建索引的核心线程数量，根据cpu自行决定，可不填，默认为10
-sim-search.size.max=10  //创建索引的最大线程数量，根据cpu自行决定，可不填，默认为200
-sim-search.size.queue=1000 //创建索引的线程队列容量，自行决定，可不填，默认为20000
-sim-search.index.init=true 重启时是否要对之前的索引进行删除，默认为false
+#索引存储器 默认为内存 [memory,memory-fs,base-fs,nio-fs]
+#内存富裕的情况下使用memory，如果是百万以上数据量选用fs系列
+sim-search.saver=memory
+#索引位置，可不填，saver=memory时需配置
+sim-search.dir=xxx
+#创建索引的核心线程数量，根据cpu自行决定，可不填，默认为5
+sim-search.thread-core-size=5
+#创建索引的最大线程数量，根据cpu自行决定，可不填，默认为200
+sim-search.thread-max-size=10
+#创建索引的线程队列容量，自行决定，可不填，默认为200000
+sim-search.thread-queue-size=200000
+#重启时是否要对之前的索引进行删除，默认为false
+sim-search.index.init=true
+#最大返回的搜索结果数量
+sim-search.result.size=50
 ```
 
 #### 使用说明
 
 1.  在需要创建索引的实体上标注需要创建索引的字段
+2. 
 ```java
 import cn.langpy.simsearch.annotation.IndexColumn;
 import cn.langpy.simsearch.annotation.IndexId;
 
 public class Student {
-    /*索引唯一id*/
+    /*索引唯一id 必须*/
     @IndexId 
     private String id;
-    /*需要创建索引的字段*/
+    /*需要创建索引的字段：用来模糊搜索*/
     @IndexColumn
     private String studentName;
     @IndexColumn
@@ -68,6 +92,7 @@ import cn.langpy.simsearch.annotation.SearchIndex;
 @Service
 public class StudentServiceImpl implements StudentService {
     /*加上@CreateIndex后 异步创建索引，不影响正常业务的保存逻辑 indexParam:需要创建索引的参数*/
+    /*该注解包含了更新操作 有则更新 无则创建*/
     @CreateIndex(indexParam = "student")
    public  boolean insert(Student student){
      /*业务逻辑*/
@@ -94,16 +119,15 @@ public class StudentServiceImpl implements StudentService {
 @Service
 public class StudentServiceImpl implements StudentService {
    /*根据studentName属性搜索Student 搜索的属性要和实体的属性保持一致  */
-   @SearchIndex(by = "studentName",searchEntity = Student.class)
-   public  List<Student> search(String studentName){
+   @SearchIndex(by = "studentName")
+   public  List<Student> search(Student student){
     /*方法内部什么都不需要写*/
-    
      return null;
    }
 
    /*根据schoolName属性搜索Student */
-   @SearchIndex(by = "schoolName",searchEntity = Student.class)
-   public  List<Student> search(String schoolName){
+   @SearchIndex(by = "schoolName")
+   public  List<Student> search(Student Student){
     /*方法内部什么都不需要写*/
     /*如果再索引中未查到对应信息，可通过该方法设置默认查询，比如往数据库进行like模糊匹配*/
      return searchWithLikeByName(schoolName);
@@ -122,9 +146,12 @@ public class StudentServiceImpl implements StudentService {
 
 > V1.3：修复启动时索引目录未创建报错的bug
 
+> V2.0.0.BETA：全新的版本
+
 #### 问题说明
 
-1.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖，自行引入
+1.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖（或者spring-boot-starter-aop），自行引入
+
 ```
  <dependency>
         <groupId>org.aspectj</groupId>
