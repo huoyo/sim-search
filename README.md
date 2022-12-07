@@ -50,7 +50,7 @@
 #内存富裕的情况下使用memory，如果是百万以上数据量选用fs系列
 sim-search.saver=memory
 #索引位置，可不填，saver=memory时需配置
-sim-search.dir=xxx
+sim-search.dir=/data/indexlocation
 #创建索引的核心线程数量，根据cpu自行决定，可不填，默认为5
 sim-search.thread-core-size=5
 #创建索引的最大线程数量，根据cpu自行决定，可不填，默认为200
@@ -138,7 +138,24 @@ public class StudentServiceImpl implements StudentService {
    }
 }
 ```
-注意：搜索结果仅仅是搜索出加上@IndexId和@IndexColumn的字段，具体内容自行往业务数据库查询
+
+`注意：搜索结果仅仅是搜索出加上@IndexId和@IndexColumn的字段，具体内容自行往业务数据库查询`
+
+#### 工具类
+
+```java
+public class IndexManager{
+    /*创建索引*/
+    public static void createIndex(IndexContent indexContent);
+    /*删除索引*/
+    public static void deleteIndex(String idName, String idValue,Class entityClass);
+    /*搜索 想见源码的demo项目*/
+    public static <T> List<T> searchIndexIds(String name, String value,Class<?> entityClass);
+    /*搜索 想见源码的demo项目*/
+    public static <T> List<T> searchIndexObjects(String name, String value,Class entityClass);
+    public static void deleteAll();
+}
+```
 
 #### 版本说明
 
@@ -162,4 +179,33 @@ public class StudentServiceImpl implements StudentService {
         <artifactId>aspectjweaver</artifactId>
         <version>xxx</version>
   </dependency>
+```
+
+2. 分布式项目中的索引同步，可以自行从数据库加载数据，然后创建索引
+
+```java
+public class Student {
+    /*索引唯一id 必须*/
+    @IndexId
+    private String id;
+    /*需要创建索引的字段：用来模糊搜索*/
+    @IndexColumn
+    private String studentName;
+}
+```
+```java
+IndexContent index = new IndexContent();
+/*存储的是Student类型*/
+index.setEntitySource(Student.class);
+/*设置建立索引的id字段*/
+index.setIdName("id");
+/*id字段的值*/
+index.setIdValue("id的值");
+List<IndexItem> indexItems = new ArrayList<>();
+indexItems indexItem = new IndexItem();
+indexItems.setName("studentName");
+indexItems.setValue("张三");
+indexItems.add(indexItem);
+index.setItems(indexItems);
+IndexManager.createIndex(index);
 ```
