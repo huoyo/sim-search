@@ -14,13 +14,9 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class DefaultAopService implements AopService {
-    private final static List<Class<?>> baseTypes = Arrays.asList(Integer.class, Double.class, Float.class, String.class, Boolean.class, List.class, Math.class);
 
     public String getIndexParam(String indexParam, String[] paramNames, Method method) {
         if (StringUtils.isEmpty(indexParam)) {
@@ -47,12 +43,7 @@ public class DefaultAopService implements AopService {
         return indexParamValue;
     }
 
-    public void checkParamValue(Object indexParamValue) {
-        Class<?> aClass = indexParamValue.getClass();
-        if (baseTypes.contains(aClass)) {
-            throw new RuntimeException("can not create index for base types:" + baseTypes);
-        }
-    }
+
 
     @Override
     public IndexContent getIndexContent(ProceedingJoinPoint joinPoint) {
@@ -62,33 +53,8 @@ public class DefaultAopService implements AopService {
         String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
         Object[] paramValues = joinPoint.getArgs();
         Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
-        checkParamValue(indexParamValue);
-        Field[] fields = indexParamValue.getClass().getDeclaredFields();
-        IndexContent indexContent = new IndexContent();
-        List<IndexItem> indexItems = new ArrayList<>();
-        for (int j = 0; j < fields.length; j++) {
-            Field field = fields[j];
-            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
-                continue;
-            }
-            IndexId indexId = field.getAnnotation(IndexId.class);
-            if (indexId != null) {
-                Object indexIdColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
-                indexContent.setIdName(field.getName());
-                indexContent.setIdValue(indexIdColumnValue + "");
-                continue;
-            }
-            IndexColumn indexColumn = field.getAnnotation(IndexColumn.class);
-            if (indexColumn != null) {
-                Object indexColumnValue = ReflectUtil.getFieldValue(field, indexParamValue);
-                IndexItem indexItem = new IndexItem();
-                indexItem.setName(field.getName());
-                indexItem.setValue(indexColumnValue + "");
-                indexItems.add(indexItem);
-            }
-        }
-        indexContent.setEntitySource(indexParamValue.getClass());
-        indexContent.setItems(indexItems);
+        ReflectUtil.checkParamValue(indexParamValue);
+        IndexContent indexContent = ReflectUtil.toIndexContent(indexParamValue);
         return indexContent;
     }
 
@@ -101,7 +67,7 @@ public class DefaultAopService implements AopService {
         Object[] paramValues = joinPoint.getArgs();
 
         Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
-        checkParamValue(indexParamValue);
+        ReflectUtil.checkParamValue(indexParamValue);
         Field[] fields = indexParamValue.getClass().getDeclaredFields();
         IndexItem indexContent = new IndexItem();
         for (int j = 0; j < fields.length; j++) {
@@ -130,7 +96,7 @@ public class DefaultAopService implements AopService {
 
         Object[] paramValues = joinPoint.getArgs();
         Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
-        checkParamValue(indexParamValue);
+        ReflectUtil.checkParamValue(indexParamValue);
         String searchColumnName = createIndex.by();
         if (StringUtils.isEmpty(searchColumnName)) {
             throw new RuntimeException("error by in @SearchIndex on method " + method.getName());

@@ -50,6 +50,11 @@ public class IndexManager implements ApplicationContextAware {
     public static void createIndex(IndexContent indexContent) {
         indexService.createIndex(indexContent);
     }
+    public static void createIndex(Object entity) {
+        ReflectUtil.checkParamValue(entity);
+        IndexContent indexContent = ReflectUtil.toIndexContent(entity);
+        indexService.createIndex(indexContent);
+    }
 
     /**
      * delete index  by idName and idValue
