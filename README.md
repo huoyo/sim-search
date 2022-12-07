@@ -41,6 +41,8 @@
   </dependency>
 ```
 
+`使用了@Aspect注解，未引入的自行引入，如aspectj或者spring-boot-starter-aop`
+
 2.  配置信息
 
 在application.properties中配置
@@ -174,7 +176,7 @@ public class IndexManager{
 
 #### 问题说明
 
-1.  本项目中使用了aspectjweaver依赖，如果引入的项目中没有该依赖（或者spring-boot-starter-aop），自行引入
+1.  本项目中使用了aspectjweaver依赖，如果项目中没有该依赖（或者spring-boot-starter-aop），自行引入
 
 ```
  <dependency>
