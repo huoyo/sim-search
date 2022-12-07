@@ -51,12 +51,26 @@ public class IndexManager implements ApplicationContextAware {
     public static void createIndex(IndexContent indexContent) {
         indexService.createIndex(indexContent);
     }
+
+    /**
+     * create index for an entity object
+     */
     public static void createIndex(Object entity) {
         ReflectUtil.checkParamValue(entity);
         IndexContent indexContent = ReflectUtil.toIndexContent(entity);
         indexService.createIndex(indexContent);
     }
-
+    /**
+     * create indexes for the entity list
+     */
+    public static void createIndexes(List<Object> entities) {
+        createIndexs(entities);
+    }
+    /**
+     * create indexes for the entity list
+     * note:its name should be createIndexes,but it was too late when I discovered this error because of my terrible English (released already)
+     */
+    @Deprecated
     public static void createIndexs(List<Object> entities) {
         if (entities.size()==0) {
             return;

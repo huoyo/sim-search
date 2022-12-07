@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IndexService {
     /**
-     * create index by idName and idValue (it will delete existed index,so you can think of this method as insertOrUpdate())
+     * create indexes by IndexContent list (it will delete existed index,so you can think of this method as insertOrUpdate())
      */
     void batchCreateIndex(List<IndexContent> indexContents);
 
