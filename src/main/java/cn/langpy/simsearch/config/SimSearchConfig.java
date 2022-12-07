@@ -20,9 +20,18 @@ public class SimSearchConfig {
     private Integer threadMaxSize = 200;
     @Deprecated
     private Integer sizeQueue = 20000;
-    private Integer threadQueueSize = 20000;
+    private Integer threadQueueSize = 200000;
+    private Integer resultSize = 50;
     @Deprecated
     private Boolean indexInit = false;
+
+    public Integer getResultSize() {
+        return resultSize;
+    }
+
+    public void setResultSize(Integer resultSize) {
+        this.resultSize = resultSize;
+    }
 
     public String getDir() {
         return dir;

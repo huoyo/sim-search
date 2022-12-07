@@ -38,8 +38,15 @@
     {
       "name": "sim-search.thread-queue-size",
       "type": "java.lang.Integer",
-      "defaultValue": 20000,
+      "defaultValue": 200000,
       "description": "the size of queue to store index data",
+      "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
+    },
+    {
+      "name": "sim-search.result-size",
+      "type": "java.lang.Integer",
+      "defaultValue": 50,
+      "description": "the size of search result",
       "sourceType": "cn.langpy.simsearch.config.SimSearchConfig"
     },
     {

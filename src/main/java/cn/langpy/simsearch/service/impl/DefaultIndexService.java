@@ -1,10 +1,9 @@
 package cn.langpy.simsearch.service.impl;
 
+import cn.langpy.simsearch.config.SimSearchConfig;
 import cn.langpy.simsearch.model.IndexContent;
 import cn.langpy.simsearch.model.IndexItem;
 import cn.langpy.simsearch.service.IndexService;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
@@ -28,6 +27,8 @@ public class DefaultIndexService implements IndexService {
     IndexWriter indexWriter;
     @Autowired
     SearcherManager searcherManager;
+    @Autowired
+    SimSearchConfig searchConfig;
 
     @Override
     public synchronized void createIndex(IndexContent indexContent) {
@@ -84,7 +85,7 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String entityName, String name, String value) {
-        return searchIndexs(entityName, name, value, 50);
+        return searchIndexs(entityName, name, value, searchConfig.getResultSize());
     }
 
     public BooleanQuery buildStrictQuery(String entityName, String name, String value) {
@@ -100,9 +101,13 @@ public class DefaultIndexService implements IndexService {
     public Query buildFuzzyQuery(String entityName, String name, String value) {
         Query query1 = null;
         if (value.matches("^[a-zA-Z0-9]+$")) {
-             query1=new FuzzyQuery(new Term(name,value),2);
-        }else {
-            QueryParser queryParser = new QueryParser(name,new StandardAnalyzer());
+            int maxEdit = 2;
+            if (value.length()<3) {
+                maxEdit = 0;
+            }
+            query1 = new FuzzyQuery(new Term(name, value), maxEdit);
+        } else {
+            QueryParser queryParser = new QueryParser(name, new StandardAnalyzer());
             try {
                 query1 = queryParser.parse(value);
             } catch (ParseException e) {
@@ -118,7 +123,7 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String name, String value) {
-        if (value==null || name==null) {
+        if (value == null || value.length() == 0 || name == null) {
             return Collections.emptyList();
         }
         value = value.trim();
@@ -130,12 +135,11 @@ public class DefaultIndexService implements IndexService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         TopDocs topDocs = null;
         QueryParser qp = new QueryParser(name, new StandardAnalyzer());
         try {
             Query q = qp.parse(value);
-            topDocs = indexSearcher.search(q, 100);
+            topDocs = indexSearcher.search(q, searchConfig.getResultSize());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -155,7 +159,7 @@ public class DefaultIndexService implements IndexService {
 
     @Override
     public List<Document> searchIndexs(String entityName, String name, String value, int topn) {
-        if (value==null || name==null) {
+        if (value == null || value.length() == 0 || name == null) {
             return Collections.emptyList();
         }
         value = value.trim();
@@ -167,7 +171,6 @@ public class DefaultIndexService implements IndexService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         TopDocs topDocs = null;
         try {
             topDocs = indexSearcher.search(buildFuzzyQuery(entityName, name, value), topn);

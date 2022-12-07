@@ -52,8 +52,8 @@ public class IndexConfig {
     }
 
     public String checkDir() {
-        String indexDir = null;
-        if (searchConfig.getDir() == null || searchConfig.getDir().length() == 0) {
+        String indexDir = searchConfig.getDir();
+        if (indexDir == null || indexDir.length() == 0) {
             indexDir = System.getProperty("user.dir") + separator + defaultIndexDirName;
         }
         File file = new File(searchConfig.getDir());
