@@ -151,9 +151,9 @@ public class IndexManager{
     public static void createIndex(IndexContent indexContent);
     /*删除索引*/
     public static void deleteIndex(String idName, String idValue,Class entityClass);
-    /*搜索 想见源码的demo项目*/
+    /*搜索 详见源码的demo项目*/
     public static <T> List<T> searchIndexIds(String name, String value,Class<?> entityClass);
-    /*搜索 想见源码的demo项目*/
+    /*搜索 详见源码的demo项目*/
     public static <T> List<T> searchIndexObjects(String name, String value,Class entityClass);
     public static void deleteAll();
     /*为对象创建索引*/
