@@ -31,7 +31,8 @@
 
 #### 安装教程
 
-1.  引入依赖 或者 下载发行版本
+1.  引入依赖
+
 ```
  <dependency>
     <groupId>cn.langpy</groupId>
@@ -43,7 +44,8 @@
 2.  配置信息
 
 在application.properties中配置
-```
+
+```properties
 #索引存储器 默认为内存 [memory,memory-fs,base-fs,nio-fs]
 #内存富裕的情况下使用memory，如果是百万以上数据量选用fs系列
 sim-search.saver=memory
@@ -63,8 +65,10 @@ sim-search.result.size=50
 
 #### 使用说明
 
+>也可参考[demo项目](https://gitee.com/huoyo/sim-search/tree/master/simsearchdemo)
+
 1.  在需要创建索引的实体上标注需要创建索引的字段
-2. 
+
 ```java
 import cn.langpy.simsearch.annotation.IndexColumn;
 import cn.langpy.simsearch.annotation.IndexId;
