@@ -7,7 +7,7 @@
 </div>
 
 <div align="center">
-    <img src='https://shields.io/badge/version-2.0.0.BETA-green.svg'>
+    <img src='https://shields.io/badge/version-2.0.0-green.svg'>
     <img src='https://shields.io/badge/author-Chang Zhang-dbab09.svg'>
     <img src='https://shields.io/badge/dependencies-Spring|aspectjweaver|lucene-r.svg'>
 </div>
@@ -37,7 +37,7 @@
  <dependency>
     <groupId>cn.langpy</groupId>
     <artifactId>simsearch</artifactId>
-    <version>2.0.0.BETA</version>
+    <version>2.0.0</version>
   </dependency>
 ```
 
@@ -154,6 +154,9 @@ public class IndexManager{
     /*搜索 想见源码的demo项目*/
     public static <T> List<T> searchIndexObjects(String name, String value,Class entityClass);
     public static void deleteAll();
+    /*为对象创建索引*/
+    public static void createIndex(Object entity);
+    public static void createIndexs(List<Object> entities);
 }
 ```
 
@@ -194,18 +197,6 @@ public class Student {
 }
 ```
 ```java
-IndexContent index = new IndexContent();
-/*存储的是Student类型*/
-index.setEntitySource(Student.class);
-/*设置建立索引的id字段*/
-index.setIdName("id");
-/*id字段的值*/
-index.setIdValue("id的值");
-List<IndexItem> indexItems = new ArrayList<>();
-indexItems indexItem = new IndexItem();
-indexItems.setName("studentName");
-indexItems.setValue("张三");
-indexItems.add(indexItem);
-index.setItems(indexItems);
-IndexManager.createIndex(index);
+Student student = xxx;
+IndexManager.createIndex(student);
 ```
