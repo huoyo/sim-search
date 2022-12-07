@@ -3,7 +3,7 @@
 
 
 <div align="center">
-    <h1 >SimSearch</h1> 
+    <h1 >SimSearch<img src='https://shields.io/badge/forJava-r.svg'></h1>  
 </div>
 
 <div align="center">
