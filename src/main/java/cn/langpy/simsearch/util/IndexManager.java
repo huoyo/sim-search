@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,6 +55,36 @@ public class IndexManager implements ApplicationContextAware {
         ReflectUtil.checkParamValue(entity);
         IndexContent indexContent = ReflectUtil.toIndexContent(entity);
         indexService.createIndex(indexContent);
+    }
+
+    public static void createIndexs(List<Object> entities) {
+        if (entities.size()==0) {
+            return;
+        }
+        if (entities.size()<5000) {
+            List<IndexContent> indexContents = new ArrayList<>();
+            for (Object entity : entities) {
+                ReflectUtil.checkParamValue(entity);
+                IndexContent indexContent = ReflectUtil.toIndexContent(entity);
+                indexContents.add(indexContent);
+            }
+            indexService.batchCreateIndex(indexContents);
+        }else {
+            List<IndexContent> indexContents = new ArrayList<>();
+            for (Object entity : entities) {
+                ReflectUtil.checkParamValue(entity);
+                IndexContent indexContent = ReflectUtil.toIndexContent(entity);
+                indexContents.add(indexContent);
+                if (indexContents.size()>=5000) {
+                    indexService.batchCreateIndex(indexContents);
+                    indexContents.clear();
+                }
+            }
+            if (indexContents.size()>0) {
+                indexService.batchCreateIndex(indexContents);
+            }
+        }
+
     }
 
     /**

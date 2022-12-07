@@ -7,6 +7,7 @@ import cn.langpy.simsearchdemo.entity.Test1;
 import cn.langpy.simsearchdemo.service.Test1Service;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class Test1ServiceImpl implements Test1Service {
     public List<Test1> fuzzyQuery(Test1 test1) {
         /*方法内部什么都不需要写*/
         /*如果再索引中未查到对应信息，可通过该方法设置默认查询，比如往数据库进行like模糊匹配*/
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

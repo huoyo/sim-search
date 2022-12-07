@@ -11,6 +11,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.store.Directory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,31 @@ public class DefaultIndexService implements IndexService {
     @Autowired
     IndexWriter indexWriter;
     @Autowired
+    Directory directory;
+    @Autowired
     SearcherManager searcherManager;
     @Autowired
     SimSearchConfig searchConfig;
 
     @Override
-    public synchronized void createIndex(IndexContent indexContent) {
+    public void batchCreateIndex(List<IndexContent> indexContents) {
+        try {
+            for (IndexContent indexContent : indexContents) {
+                preDeleteIndex(indexContent.getEntitySource().getSimpleName(), indexContent.getIdName(), indexContent.getIdValue());
+                preCreateIndex(indexContent);
+            }
+            indexWriter.commit();
+        } catch (IOException e) {
+            try {
+                indexWriter.rollback();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    private void preCreateIndex(IndexContent indexContent) throws IOException {
         try {
             Document doc = new Document();
             doc.add(new StringField(indexContent.getIdName(), indexContent.getIdValue(), Field.Store.YES));
@@ -39,9 +59,23 @@ public class DefaultIndexService implements IndexService {
             for (IndexItem item : indexContent.getItems()) {
                 doc.add(new TextField(item.getName(), item.getValue(), Field.Store.YES));
             }
-            deleteIndex(indexContent.getEntitySource().getSimpleName(), indexContent.getIdName(), indexContent.getIdValue());
             indexWriter.addDocument(doc);
-            indexWriter.flush();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public void createIndex(IndexContent indexContent) {
+        try {
+            Document doc = new Document();
+            doc.add(new StringField(indexContent.getIdName(), indexContent.getIdValue(), Field.Store.YES));
+            doc.add(new StringField(entityField, indexContent.getEntitySource().getSimpleName(), Field.Store.YES));
+            for (IndexItem item : indexContent.getItems()) {
+                doc.add(new TextField(item.getName(), item.getValue(), Field.Store.YES));
+            }
+            preDeleteIndex(indexContent.getEntitySource().getSimpleName(), indexContent.getIdName(), indexContent.getIdValue());
+            indexWriter.addDocument(doc);
             indexWriter.commit();
         } catch (IOException e) {
             try {
@@ -65,6 +99,13 @@ public class DefaultIndexService implements IndexService {
                 ex.printStackTrace();
             }
             e.printStackTrace();
+        }
+    }
+    private void preDeleteIndex(String entityName, String idName, String idValue) throws IOException {
+        try {
+            indexWriter.deleteDocuments(buildStrictQuery(entityName, idName, idValue));
+        } catch (IOException e) {
+            throw e;
         }
     }
 
