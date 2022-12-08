@@ -1,5 +1,5 @@
 
-> 本项目由于之前的架构有些问题，关闭了一段时间，经过重构进行开放
+> 本项目由于之前的架构有些问题，关闭了一段时间，经过重构进行开放，也很期待各位提出宝贵的建议
 
 
 <div align="center">
@@ -28,7 +28,7 @@
 
 #### 索引测试
 
-使用[100万行中文](https://gitee.com/huoyo/sim-search/blob/master/test/text.txt) 进行模糊搜索测试
+使用[100万行中文](https://gitee.com/huoyo/sim-search/blob/master/test/text.txt) 创建索引后进行模糊搜索测试
 
 `i7 16g`
 
@@ -39,9 +39,23 @@
 | memory-fs([nmap文件模式](https://baike.baidu.com/item/mmap/1322217?fr=aladdin))      | 23.75ms   | 114.12ms  | 8.4ms  |
 | memory(内存模式)      | 11.56ms   | 42.35ms  | 7.04ms  |
 
+使用1000万行中文类似的中文创建索引后进行模糊搜索测试
+
+`i7 16g`
+
+| 存储模式（saver） | 平均耗时 | 最大耗时 | 最小耗时 |
+|:-|:-:|:-:|:-:|
+| nio-fs([nio](https://baike.baidu.com/item/java.nio/5180052?fr=aladdin)文件模式)      | 55.33ms   | 151.5ms  | 20.65ms  |
+| base-fs(常规文件系统)      | 63.02ms   | 102.73ms  | 15.34ms  |
+| memory-fs([nmap文件模式](https://baike.baidu.com/item/mmap/1322217?fr=aladdin))      | 51.44ms   | 180.38ms  | 7.15ms  |
+| memory(内存模式)      | 12.98ms   | 50.26ms  | 8.04ms  |
+
 `相对于文件系统，内存性能最好的无疑的，前提是内存有余，或者数据量不是很过分`
 
-`另外，以上结果仅仅作为一个参考，不能说明nio的性能就最差，根据数据量和场景选择`
+`测试的文本相对来说较短，如果是长文本，理论上上来说性能会下降一些`
+
+`另外，以上结果仅仅作为一个参考`
+
 
 
 #### 安装教程
