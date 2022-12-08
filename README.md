@@ -27,7 +27,16 @@
 - [x] 基于倒排索引，避免全量匹配和手动分词
 - [x] 底层基于lucene
 
+#### 索引测试
 
+使用[100万行中文](https://gitee.com/huoyo/sim-search/blob/master/test/text.txt) 进行模糊搜索测试
+
+`i7 16g`
+
+| 存储模式（saver） | 平均耗时 | 最大耗时 | 最小耗时 |
+|:-:|:-:|:-:|:-:|
+| nio-fs(文件模式)      | 45.93ms   | 144.5ms  | 15.04ms  |
+| memory(内存模式)      | 18.56ms   | 42.35ms  | 11.04ms  |
 
 #### 安装教程
 
@@ -51,7 +60,7 @@
 #索引存储器 默认为内存 [memory,memory-fs,base-fs,nio-fs]
 #内存富裕的情况下使用memory，如果是百万以上数据量选用fs系列
 sim-search.saver=memory
-#索引位置，可不填，saver=memory时需配置
+#索引位置，saver!=memory时需配置
 sim-search.dir=/data/indexlocation
 #创建索引的核心线程数量，根据cpu自行决定，可不填，默认为5
 sim-search.thread-core-size=5
@@ -186,7 +195,7 @@ public class IndexManager{
   </dependency>
 ```
 
-2. 分布式项目中的索引同步，可以自行从数据库加载数据，然后创建索引
+2. 分布式项目中的索引同步，可以自行从数据库加载数据(或者使用cannal进行同步)，然后创建索引
 
 ```java
 public class Student {
