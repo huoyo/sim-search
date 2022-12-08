@@ -176,6 +176,9 @@ public class StudentServiceImpl implements StudentService {
 
 ```java
 public class IndexManager{
+    /*为对象创建索引*/
+    public static void createIndex(Object entity);
+    public static void createIndexs(List<Object> entities);
     /*创建索引*/
     public static void createIndex(IndexContent indexContent);
     /*删除索引*/
@@ -185,9 +188,6 @@ public class IndexManager{
     /*搜索 详见源码的demo项目*/
     public static <T> List<T> searchIndexObjects(String name, String value,Class entityClass);
     public static void deleteAll();
-    /*为对象创建索引*/
-    public static void createIndex(Object entity);
-    public static void createIndexs(List<Object> entities);
 }
 ```
 
@@ -215,7 +215,7 @@ public class IndexManager{
   </dependency>
 ```
 
-2. 分布式项目中的索引同步，可以自行从数据库加载数据(或者使用cannal进行同步)，然后创建索引
+2. 分布式项目中的索引同步，可以自行从数据库加载数据(或者使用canal进行同步)，然后创建索引
 
 ```java
 public class Student {
@@ -228,7 +228,8 @@ public class Student {
 }
 ```
 ```java
-Student student = xxx;
+Student student = new Student();
+        ...
 IndexManager.createIndex(student);
 ```
 
