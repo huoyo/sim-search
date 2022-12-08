@@ -25,7 +25,6 @@
 - [x] 注解实现索引创建和搜索，与业务逻辑无耦合
 - [x] 可用于大数据量模糊搜索，毫秒级响应
 - [x] 基于倒排索引，避免全量匹配和手动分词
-- [x] 底层基于lucene
 
 #### 索引测试
 
@@ -34,9 +33,11 @@
 `i7 16g`
 
 | 存储模式（saver） | 平均耗时 | 最大耗时 | 最小耗时 |
-|:-:|:-:|:-:|:-:|
-| nio-fs(文件模式)      | 45.93ms   | 144.5ms  | 15.04ms  |
-| memory(内存模式)      | 18.56ms   | 42.35ms  | 11.04ms  |
+|:-|:-:|:-:|:-:|
+| nio-fs(nio文件模式)      | 45.93ms   | 144.5ms  | 15.04ms  |
+| base-fs(常规文件系统)      | 25.93ms   | 97.32ms  | 12.24ms  |
+| memory-fs([nmap文件模式](https://baike.baidu.com/item/mmap/1322217?fr=aladdin))      | 23.75ms   | 114.12ms  | 8.4ms  |
+| memory(内存模式)      | 11.56ms   | 42.35ms  | 7.04ms  |
 
 #### 安装教程
 
@@ -211,3 +212,9 @@ public class Student {
 Student student = xxx;
 IndexManager.createIndex(student);
 ```
+
+#### 技术栈
+
+- lucene
+- aop
+- spring
