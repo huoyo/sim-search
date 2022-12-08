@@ -39,7 +39,7 @@
 | memory-fs([nmap文件模式](https://baike.baidu.com/item/mmap/1322217?fr=aladdin))      | 23.75ms   | 114.12ms  | 8.4ms  |
 | memory(内存模式)      | 11.56ms   | 42.35ms  | 7.04ms  |
 
-使用1000万行中文类似的中文创建索引后进行模糊搜索测试
+使用1000万行类似的中文创建索引后进行模糊搜索测试
 
 `i7 16g`
 
