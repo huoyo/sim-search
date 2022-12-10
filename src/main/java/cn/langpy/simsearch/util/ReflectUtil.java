@@ -6,7 +6,6 @@ import cn.langpy.simsearch.annotation.IndexId;
 import cn.langpy.simsearch.model.IndexContent;
 import cn.langpy.simsearch.model.IndexItem;
 import org.apache.lucene.document.Document;
-import org.springframework.util.StringUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;

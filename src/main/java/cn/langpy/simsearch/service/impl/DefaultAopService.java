@@ -11,6 +11,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -19,7 +20,7 @@ import java.lang.reflect.Modifier;
 public class DefaultAopService implements AopService {
 
     public String getIndexParam(String indexParam, String[] paramNames, Method method) {
-        if (StringUtils.isEmpty(indexParam)) {
+        if (StringUtils.hasText(indexParam)) {
             if (paramNames.length == 0) {
                 throw new RuntimeException("can not create index for method " + method.getName() + ",cause it has not any parameter");
             }
@@ -44,11 +45,10 @@ public class DefaultAopService implements AopService {
     }
 
 
-
     @Override
     public IndexContent getIndexContent(ProceedingJoinPoint joinPoint) {
-        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        CreateIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(CreateIndex.class);
+        Method method = getMethod(joinPoint);
+        CreateIndex createIndex = getAnnotation(method,CreateIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
         Object[] paramValues = joinPoint.getArgs();
@@ -60,8 +60,8 @@ public class DefaultAopService implements AopService {
 
     @Override
     public IndexItem getDeleteItem(ProceedingJoinPoint joinPoint) {
-        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        DeleteIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(DeleteIndex.class);
+        Method method = getMethod(joinPoint);
+        DeleteIndex createIndex = getAnnotation(method,DeleteIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
         Object[] paramValues = joinPoint.getArgs();
@@ -89,8 +89,8 @@ public class DefaultAopService implements AopService {
 
     @Override
     public IndexItem getSearchItem(ProceedingJoinPoint joinPoint) {
-        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-        SearchIndex createIndex = ((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(SearchIndex.class);
+        Method method = getMethod(joinPoint);
+        SearchIndex createIndex = getAnnotation(method,SearchIndex.class);
         String[] paramNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         String indexParamName = getIndexParam(createIndex.indexParam(), paramNames, method);
 
@@ -98,7 +98,7 @@ public class DefaultAopService implements AopService {
         Object indexParamValue = getIndexParamValue(paramNames, paramValues, indexParamName, method);
         ReflectUtil.checkParamValue(indexParamValue);
         String searchColumnName = createIndex.by();
-        if (StringUtils.isEmpty(searchColumnName)) {
+        if (StringUtils.hasText(searchColumnName)) {
             throw new RuntimeException("error by in @SearchIndex on method " + method.getName());
         }
 
@@ -117,6 +117,15 @@ public class DefaultAopService implements AopService {
         }
         indexContent.setEntitySource(indexParamValue.getClass());
         return indexContent;
+    }
+
+    private Method getMethod(ProceedingJoinPoint joinPoint) {
+        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        return method;
+    }
+
+    private  <T extends Annotation> T getAnnotation(Method method,Class<T> annotationClass) {
+        return method.getAnnotation(annotationClass);
     }
 
     @Override
