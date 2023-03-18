@@ -1,7 +1,7 @@
 
 > 本项目由于之前的架构有些问题，关闭了一段时间，经过重构进行开放，也很期待各位提出宝贵的建议
 
-[支持作者和技术服务](https://afdian.net/a/huoyo)
+[别拦我，我要支持作者](https://afdian.net/a/huoyo)
 
 <div align="center">
     <h1 >SimSearch<img src='https://shields.io/badge/forJava-r.svg'></h1>  
